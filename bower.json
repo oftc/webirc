@@ -1,0 +1,21 @@
+{
+  "name": "webirc2",
+  "description": "Web based IRC",
+  "main": "index.js",
+  "authors": [
+    "Stuart Walsh <stu@ipng.org.uk>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
