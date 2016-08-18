@@ -24,10 +24,27 @@ describe('The TextWindow component', function() {
     describe('on first render and some messages', function() {
         it('should render messages', function() {
             const renderer = TestUtils.createRenderer();
-            renderer.render(<TextWindow messages={[{ timestamp: '', comand: '', args: [] }]} />);
+            renderer.render(<TextWindow messages={[{ timestamp: '', command: '', args: [] }]} />);
             const output = renderer.getRenderOutput();
 
             expect(output.type).to.equals('div');
+            const childProps = React.Children.toArray(output.props.children);
+            expect(childProps).to.not.be.empty;
+        });
+    });
+
+    describe('when messages are added', function() {
+        it('should render the new messages', function() {
+            const renderer = TestUtils.createRenderer();
+            var messages = [];
+            renderer.render(<TextWindow messages={ messages } />);
+            var output = renderer.getRenderOutput();
+
+            messages.push({ timestamp: '', command: '', args: [] });
+
+            renderer.render(<TextWindow messages={ messages } />);
+            output = renderer.getRenderOutput();
+
             const childProps = React.Children.toArray(output.props.children);
             expect(childProps).to.not.be.empty;
         });
