@@ -1,5 +1,3 @@
-'use strict';
-
 require('./dom-mock')('<html><body></body></html>');
 
 var jsdom = require('mocha-jsdom');
@@ -8,7 +6,7 @@ var TestUtils = require('react-addons-test-utils');
 var sinon = require('sinon');
 var chai = require('chai');
 var expect = chai.expect;
-var CommandBar = require('../client/CommandBar.jsx');
+var CommandBar = require('../client/CommandBar');
 
 describe('The CommandBar Component', function() {
     describe('on first render', function() {

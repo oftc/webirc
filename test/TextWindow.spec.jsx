@@ -1,5 +1,3 @@
-'use strict';
-
 require('./dom-mock')('<html><body></body></html>');
 
 var jsdom = require('mocha-jsdom');
@@ -8,7 +6,7 @@ var TestUtils = require('react-addons-test-utils');
 var sinon = require('sinon');
 var chai = require('chai');
 var expect = chai.expect;
-var TextWindow = require('../client/TextWindow.jsx');
+var TextWindow = require('../client/TextWindow');
 
 describe('The TextWindow component', function() {
     describe('on first render and no messages', function() {

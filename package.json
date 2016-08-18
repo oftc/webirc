@@ -21,7 +21,7 @@
     "babel-eslint": "^6.1.2",
     "babel-preset-react": "^6.11.1",
     "chai": "^3.5.0",
-    "eslint": "^3.2.2",
+    "eslint": "^3.3.1",
     "eslint-plugin-react": "^6.0.0",
     "grunt": "^1.0.1",
     "grunt-autoprefixer": "^3.0.4",

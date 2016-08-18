@@ -1,5 +1,4 @@
-/*global React */
-'use strict';
+/*global React, MainWindow */
 
 var IRCStream = require('ircng');
 
@@ -17,15 +16,6 @@ class Application extends React.Component {
                 name: 'Status'
             }]
         }
-    }
-
-    onMessage(message) {
-        var messages = this.state.messages;
-        var date = moment().format('HH:mm:ss SSS');
-
-        messages.push({ timestamp: date, command: message.command, args: message.args });
-        
-        this.setState({ messages: messages });
     }
 
     componentDidMount() {
@@ -70,6 +60,15 @@ class Application extends React.Component {
         window.onbeforeunload = function(e) {
             socket.disconnect();
         }
+    }
+
+    onMessage(message) {
+        var messages = this.state.messages;
+        var date = moment().format('HH:mm:ss SSS');
+
+        messages.push({ timestamp: date, command: message.command, args: message.args });
+        
+        this.setState({ messages: messages });
     }
 
     processCommand(commandLine) {

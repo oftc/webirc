@@ -1,4 +1,4 @@
-'use strict';
+/*global React */
 
 class CommandBar extends React.Component {
     constructor() {
@@ -25,7 +25,7 @@ class CommandBar extends React.Component {
     render() {
         return (
             <div className='col-md-offset-2'>
-                <input ref='CommandBarInput' className='command-bar' type='text' onKeyPress={ this.onKeyPress } onChange={ this.onChange } value={ this.state.command }></input>
+                <input ref='CommandBarInput' className='command-bar' type='text' onKeyPress={ this.onKeyPress } onChange={ this.onChange } value={ this.state.command } />
             </div>);
     }
 }

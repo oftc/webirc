@@ -1,6 +1,12 @@
+/*global React */
+
 class TextWindow extends React.Component {
     componentDidUpdate() {
         this.updateScroll();
+    }
+
+    updateScroll() {
+        $('.text-window').scrollTop(0xffffff);
     }
 
     render() {
@@ -23,10 +29,6 @@ class TextWindow extends React.Component {
             <div id='text-window' className='text-window col-md-10 col-md-offset-2'>
                 { messages }
             </div>);
-    }
-
-    updateScroll() {
-        $('.text-window').scrollTop(0xffffff);
     }
 }
 

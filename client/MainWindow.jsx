@@ -1,3 +1,5 @@
+/*global React, ChannelList, TextWindow, CommandBar */
+
 class MainWindow extends React.Component {
     render() {
         return(
@@ -13,7 +15,7 @@ class MainWindow extends React.Component {
 
 MainWindow.displayName = 'MainWindow';
 MainWindow.propTypes = {
-    messages: React.PropTypes.array,
     channels: React.PropTypes.array,
+    messages: React.PropTypes.array,
     onCommand: React.PropTypes.func
 };
