@@ -10,7 +10,7 @@ class ChannelList extends React.Component {
             channels.push(<li key={ channel.name } className='{ className }'><a href='#'>{ channel.name }</a></li>);
         });
 
-        return(
+        return (
             <div className='channel-list col-md-2 sidebar'>
                 <ul className='nav nav-sidebar'>
                     { channels }

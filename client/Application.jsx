@@ -12,7 +12,7 @@ class Application extends React.Component {
 
         this.state = {
             messages: [],
-            channels: [ { 
+            channels: [{
                 name: 'Status'
             }]
         }
@@ -25,7 +25,7 @@ class Application extends React.Component {
 
         this.stream.on('message', this.onMessage);
         this.stream.on('send', function(message) {
-            socket.emit('message', message.message); 
+            socket.emit('message', message.message);
         });
         this.stream.on('join', joinMessage => {
             var channels = this.state.channels;
@@ -67,7 +67,7 @@ class Application extends React.Component {
         var date = moment().format('HH:mm:ss SSS');
 
         messages.push({ timestamp: date, command: message.command, args: message.args });
-        
+
         this.setState({ messages: messages });
     }
 

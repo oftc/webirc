@@ -21,7 +21,7 @@ describe('The CommandBar Component', function() {
             expect(props[0].props.value).to.equals('');
         });
     });
-    
+
     describe('when the input is changed', function() {
         it('should set the command value when the input is changed', function() {
             const renderer = TestUtils.createRenderer();
@@ -42,7 +42,7 @@ describe('The CommandBar Component', function() {
             it('should not raise a command event', function() {
                 var spy = sinon.spy();
                 const renderer = TestUtils.createRenderer();
-                
+
                 renderer.render(<CommandBar onCommand={ spy }/>);
                 var output = renderer.getRenderOutput();
                 var props = React.Children.toArray(output.props.children);
@@ -58,7 +58,7 @@ describe('The CommandBar Component', function() {
             it('should raise a command event', function() {
                 var spy = sinon.spy();
                 const renderer = TestUtils.createRenderer();
-                
+
                 renderer.render(<CommandBar onCommand={ spy }/>);
                 var output = renderer.getRenderOutput();
                 var props = React.Children.toArray(output.props.children);
@@ -74,7 +74,7 @@ describe('The CommandBar Component', function() {
             it('should raise a command event with the current command value', function() {
                 var spy = sinon.spy();
                 const renderer = TestUtils.createRenderer();
-                
+
                 renderer.render(<CommandBar onCommand={ spy }/>);
                 var output = renderer.getRenderOutput();
                 var props = React.Children.toArray(output.props.children);

@@ -24,7 +24,7 @@ describe('The TextWindow component', function() {
     describe('on first render and some messages', function() {
         it('should render messages', function() {
             const renderer = TestUtils.createRenderer();
-            renderer.render(<TextWindow messages={[{timestamp: '', comand: '', args:[]}]} />);
+            renderer.render(<TextWindow messages={[{ timestamp: '', comand: '', args: [] }]} />);
             const output = renderer.getRenderOutput();
 
             expect(output.type).to.equals('div');
