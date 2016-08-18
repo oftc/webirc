@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cryogen/webirc.git"
+  },
   "author": "Stuart Walsh <stu@ipng.org.uk>",
   "license": "MIT",
   "dependencies": {
@@ -16,6 +20,7 @@
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "babel-preset-react": "^6.11.1",
+    "chai": "^3.5.0",
     "eslint": "^3.2.2",
     "eslint-plugin-react": "^6.0.0",
     "grunt": "^1.0.1",
@@ -28,6 +33,13 @@
     "grunt-contrib-less": "^1.4.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "load-grunt-tasks": "^3.5.0"
+    "jsdom": "^9.4.2",
+    "load-grunt-tasks": "^3.5.0",
+    "mocha": "^3.0.2",
+    "mocha-jsdom": "^1.1.0",
+    "react": "^15.3.0",
+    "react-addons-test-utils": "^15.3.0",
+    "react-dom": "^15.3.0",
+    "sinon": "^1.17.5"
   }
 }

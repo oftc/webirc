@@ -5,7 +5,7 @@ class MainWindow extends React.Component {
                 <ChannelList channels={ this.props.channels } />
                 <TextWindow messages={ this.props.messages } />
                 <footer className='footer'>
-                    <CommandBar />
+                    <CommandBar onCommand={ this.props.onCommand }/>
                 </footer>
             </div>);
     }
@@ -14,5 +14,6 @@ class MainWindow extends React.Component {
 MainWindow.displayName = 'MainWindow';
 MainWindow.propTypes = {
     messages: React.PropTypes.array,
-    channels: React.PropTypes.array
+    channels: React.PropTypes.array,
+    onCommand: React.PropTypes.func
 };

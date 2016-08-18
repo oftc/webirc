@@ -19,12 +19,10 @@ module.exports = function(grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: 'client',
-          src: ['*.jsx'],
+          cwd: '.',
+          src: ['client/*.jsx'],
           dest: 'public/js/',
-          rename: function(dest, src) {
-            return dest + src.replace('\.jsx','\.js');
-          }
+          ext: '.js',
         }]
       }
     },
@@ -85,7 +83,11 @@ module.exports = function(grunt) {
     watch: {
       jsx: {
         files: 'client/**/*.jsx',
-        tasks: 'babel'
+        tasks: ['babel']
+      },
+      jsxTest: {
+        files: 'test/**/*.jsx',
+        tasks: ['babel']
       },
       less: {
         files: 'less/**/*.less',

@@ -8,6 +8,8 @@ class Application extends React.Component {
         super();
 
         this.onMessage = this.onMessage.bind(this);
+        this.onCommand = this.onCommand.bind(this);
+        this.processCommand = this.processCommand.bind(this);
 
         this.state = {
             messages: [],
@@ -19,7 +21,6 @@ class Application extends React.Component {
 
     onMessage(message) {
         var messages = this.state.messages;
-
         var date = moment().format('HH:mm:ss SSS');
 
         messages.push({ timestamp: date, command: message.command, args: message.args });
@@ -29,16 +30,23 @@ class Application extends React.Component {
 
     componentDidMount() {
         var socket = io.connect('https://webirc.oftc.net:8443');
-        var stream = new IRCStream();
+        this.stream = new IRCStream();
         var nickAttempts = 1;
 
-        stream.on('message', this.onMessage);
-        stream.on('send', function(message) {
-            socket.emit('message', message.message);
+        this.stream.on('message', this.onMessage);
+        this.stream.on('send', function(message) {
+            socket.emit('message', message.message); 
+        });
+        this.stream.on('join', joinMessage => {
+            var channels = this.state.channels;
+
+            channels.push({ name: joinMessage.channel });
+
+            this.setState({ channels: channels });
         });
 
-        stream.on('433', function(message) {
-            stream.setNickname('WebIRC' + nickAttempts);
+        this.stream.on('433', message => {
+            this.stream.setNickname('WebIRC' + nickAttempts);
             nickAttempts++;
         });
 
@@ -46,12 +54,12 @@ class Application extends React.Component {
             console.log('socket Error: ' + error);
         });
 
-        socket.on('message', function(message) {
-            stream.push(message);
+        socket.on('message', message => {
+            this.stream.push(message);
         });
 
-        socket.on('connect', function(socket) {
-            stream.register();
+        socket.on('connect', socket => {
+            this.stream.register();
             console.info('connected');
         });
 
@@ -59,13 +67,31 @@ class Application extends React.Component {
             console.info('disconnected');
         });
 
-        window.onbeforeunload = function (e) {
+        window.onbeforeunload = function(e) {
             socket.disconnect();
         }
     }
 
+    processCommand(commandLine) {
+        var split = commandLine.split(' ');
+
+        var command = split[0];
+
+        switch(command.toUpperCase()) {
+            case 'JOIN':
+                this.stream.joinChannel(split[1]);
+                break;
+        }
+    }
+
+    onCommand(command) {
+        if(command.startsWith('/')) {
+            this.processCommand(command.slice(1));
+        }
+    }
+
     render() {
-        return (<MainWindow messages={ this.state.messages } channels={ this.state.channels } />);
+        return (<MainWindow messages={ this.state.messages } channels={ this.state.channels } onCommand={ this.onCommand } />);
     }
 }
 

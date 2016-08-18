@@ -8,13 +8,13 @@ class TextWindow extends React.Component {
 
         var itemIndex = 0;
         this.props.messages.forEach(function(item) {
-            
             var key = item.timestamp + itemIndex.toString();
 
             messages.push(
                 <div key={key}>
                     <span>[{ item.timestamp }]</span> <span>{ item.command }</span> <span>{ item.args.join(' ') }</span>
-                </div>);
+                </div>
+            );
 
             itemIndex++;
         });
@@ -32,5 +32,13 @@ class TextWindow extends React.Component {
 
 TextWindow.displayName = 'TextWindow';
 TextWindow.propTypes = {
-    messages: React.PropTypes.array
+    messages: React.PropTypes.array.isRequired
 };
+
+if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+        exports = module.exports = TextWindow;
+    }
+    
+    exports.ComandBar = TextWindow;
+}
