@@ -17,7 +17,7 @@ class TextWindow extends React.Component {
             var key = item.timestamp + itemIndex.toString();
 
             messages.push(
-                <div key={key}>
+                <div className='message' key={key}>
                     <span>[{ item.timestamp }]</span> <span>{ item.command }</span> <span>{ item.args.join(' ') }</span>
                 </div>
             );
@@ -36,11 +36,3 @@ TextWindow.displayName = 'TextWindow';
 TextWindow.propTypes = {
     messages: React.PropTypes.array.isRequired
 };
-
-if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-        exports = module.exports = TextWindow;
-    }
-    
-    exports.ComandBar = TextWindow;
-}

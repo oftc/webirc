@@ -34,11 +34,3 @@ CommandBar.displayName = 'CommandBar';
 CommandBar.propTypes = {
     onCommand: React.PropTypes.func
 };
-
-if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-        exports = module.exports = CommandBar;
-    }
-
-    exports.ComandBar = CommandBar;
-}

@@ -4,7 +4,7 @@
   "description": "Web based IRC",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "karma start"
   },
   "repository": {
     "type": "git",
@@ -33,13 +33,19 @@
     "grunt-contrib-less": "^1.4.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
+    "jasmine": "^2.4.1",
+    "jasmine-es6": "^0.2.2",
     "jsdom": "^9.4.2",
+    "karma": "^1.2.0",
+    "karma-babel-preprocessor": "^6.0.1",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.1",
     "load-grunt-tasks": "^3.5.0",
-    "mocha": "^3.0.2",
-    "mocha-jsdom": "^1.1.0",
+    "moment": "^2.14.1",
     "react": "^15.3.0",
     "react-addons-test-utils": "^15.3.0",
     "react-dom": "^15.3.0",
-    "sinon": "^1.17.5"
+    "sinon": "^1.17.5",
+    "socket.io-client": "^1.4.8"
   }
 }

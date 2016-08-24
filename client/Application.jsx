@@ -15,12 +15,13 @@ class Application extends React.Component {
             channels: [{
                 name: 'Status'
             }]
-        }
+        };
+
+        this.stream = new IRCStream();
     }
 
     componentDidMount() {
         var socket = io.connect('https://webirc.oftc.net:8443');
-        this.stream = new IRCStream();
         var nickAttempts = 1;
 
         this.stream.on('message', this.onMessage);
@@ -63,28 +64,44 @@ class Application extends React.Component {
     }
 
     onMessage(message) {
+        if(!message || !message.command) {
+            return;
+        }
+
         var messages = this.state.messages;
         var date = moment().format('HH:mm:ss SSS');
 
-        messages.push({ timestamp: date, command: message.command, args: message.args });
+        messages.push({ timestamp: date, command: message.command, args: message.args || [] });
 
         this.setState({ messages: messages });
     }
 
     processCommand(commandLine) {
+        if(!commandLine) {
+            return false;
+        }
+
         var split = commandLine.split(' ');
 
         var command = split[0];
 
         switch(command.toUpperCase()) {
             case 'JOIN':
+                if(split.length < 2) {
+                    return false;
+                }
+
                 this.stream.joinChannel(split[1]);
                 break;
+            default:
+                return false;
         }
+
+        return true;
     }
 
     onCommand(command) {
-        if(command.startsWith('/')) {
+        if(command[0] === '/') {
             this.processCommand(command.slice(1));
         }
     }
