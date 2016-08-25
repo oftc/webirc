@@ -2,9 +2,14 @@
 
 var IRCStream = require('ircng');
 
+window.testing = true;
+
 describe('the Application component', function() {
     var component;
     var socketMock = { on: function() { } };
+    
+    document.stubComponent(MainWindow);
+    document.stubComponent(ChannelList);
 
     beforeEach(function() {
         spyOn(io, 'connect').and.returnValue(socketMock);
@@ -15,46 +20,56 @@ describe('the Application component', function() {
         it('should render a main window with the status channel defined', function() {
             component = TestUtils.renderIntoDocument(<Application />);
 
-            expect(component.state.channels.length).toBe(1);
-            expect(component.state.channels[0].name).toBe('Status');
+            expect(component.state.channels.status).not.toBe(undefined);
 
             expect(IRCStream.prototype.on).toHaveBeenCalled();
         });
     });
 
     describe('onMessage', function() {
-        document.stubComponent(MainWindow);
-
         describe('when no message passed in', function() {
-            it('no messages are added to the state', function() {
+            it('should add no messages to the state', function() {
                 component = TestUtils.renderIntoDocument(<Application />);
 
                 component.onMessage();
 
-                expect(component.state.messages.length).toBe(0);
+                expect(component.state.channels.status.messages.length).toBe(0);
             });
         });
 
         describe('when message passed in but no command in it', function() {
-            it('no messages are added to the state', function() {
+            it('should add no messages to the state', function() {
                 component = TestUtils.renderIntoDocument(<Application />);
 
                 component.onMessage({});
 
-                expect(component.state.messages.length).toBe(0);
+                expect(component.state.channels.status.messages.length).toBe(0);
             });
         });
 
-        describe('when message passed in with command but no args', function() {
-            it('the message is added to the state', function() {
+        describe('when message is passed in with no target', function() {
+            it('should add the message to the status message list', function() {
                 component = TestUtils.renderIntoDocument(<Application />);
 
                 component.onMessage({ command: 'TEST' });
 
-                expect(component.state.messages.length).toBe(1);
-                expect(component.state.messages[0].command).toBe('TEST');
-                expect(component.state.messages[0].args.length).toBe(0);
-                expect(component.state.messages[0].timestamp).not.toBe('');
+                expect(component.state.channels.status.messages.length).toBe(1);
+                expect(component.state.channels.status.messages[0].command).toBe('TEST');
+                expect(component.state.channels.status.messages[0].args.length).toBe(0);
+                expect(component.state.channels.status.messages[0].timestamp).not.toBe('');
+            });
+        });
+
+        describe('when message is passed in with target', function() {
+            it('should add the message to the message list for the target', function() {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onMessage({ command: 'TEST', target: '#test' });
+
+                expect(component.state.channels['#test'].messages.length).toBe(1);
+                expect(component.state.channels['#test'].messages[0].command).toBe('TEST');
+                expect(component.state.channels['#test'].messages[0].args.length).toBe(0);
+                expect(component.state.channels['#test'].messages[0].timestamp).not.toBe('');
             });
         });
     });
@@ -102,6 +117,19 @@ describe('the Application component', function() {
                     expect(IRCStream.prototype.joinChannel).toHaveBeenCalled();
                 })
             })
+        });
+    });
+
+    describe('joinMessage', function() {
+        describe('when new channel joined', function() {
+            it('should add the new channel to the state', function() {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ channel: '#test' });
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+                expect(component.state.channels['#test'].name).toBe('#test');
+            });
         });
     });
 

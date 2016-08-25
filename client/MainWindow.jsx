@@ -1,11 +1,23 @@
 /*global React, ChannelList, TextWindow, CommandBar */
 
 class MainWindow extends React.Component {
+    constructor() {
+        super();
+    }
+
     render() {
-        return(
+        var textWindows = [];
+        var channels = [];
+
+        for(var channelKey in this.props.channels) {
+            textWindows.push(<TextWindow key={ channelKey } messages={ this.props.channels[channelKey].messages || [] } />);
+            channels.push({ name: this.props.channels[channelKey].name });
+        }
+        
+        return (
             <div>
-                <ChannelList channels={ this.props.channels } />
-                <TextWindow messages={ this.props.messages } />
+                <ChannelList channels={ channels } />
+                { textWindows }
                 <footer className='footer'>
                     <CommandBar onCommand={ this.props.onCommand }/>
                 </footer>
@@ -15,7 +27,6 @@ class MainWindow extends React.Component {
 
 MainWindow.displayName = 'MainWindow';
 MainWindow.propTypes = {
-    channels: React.PropTypes.array,
-    messages: React.PropTypes.array,
+    channels: React.PropTypes.object.isRequired,
     onCommand: React.PropTypes.func
 };

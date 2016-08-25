@@ -7,14 +7,17 @@ class Application extends React.Component {
         super();
 
         this.onMessage = this.onMessage.bind(this);
+        this.onJoin = this.onJoin.bind(this);
         this.onCommand = this.onCommand.bind(this);
         this.processCommand = this.processCommand.bind(this);
 
         this.state = {
-            messages: [],
-            channels: [{
-                name: 'Status'
-            }]
+            channels: {
+                'status': {
+                    name: 'Status',
+                    messages: []
+                }
+            }
         };
 
         this.stream = new IRCStream();
@@ -28,13 +31,8 @@ class Application extends React.Component {
         this.stream.on('send', function(message) {
             socket.emit('message', message.message);
         });
-        this.stream.on('join', joinMessage => {
-            var channels = this.state.channels;
 
-            channels.push({ name: joinMessage.channel });
-
-            this.setState({ channels: channels });
-        });
+        this.stream.on('join', this.onJoin);
 
         this.stream.on('433', message => {
             this.stream.setNickname('WebIRC' + nickAttempts);
@@ -63,17 +61,38 @@ class Application extends React.Component {
         }
     }
 
+    onJoin(joinMessage) {
+        var channels = this.state.channels;
+
+        channels[joinMessage.channel] = { name: joinMessage.channel };
+
+        this.setState({ channels: channels });
+    }
+
     onMessage(message) {
         if(!message || !message.command) {
             return;
         }
 
-        var messages = this.state.messages;
+        var channels = this.state.channels;
+        var channel = {};
+
+        if(!message.target) {
+            channel = channels.status;
+        } else {
+            channel = channels[message.target];
+
+            if(!channel) {
+                channel = { messages: [] };
+                channels[message.target] = channel;
+            }
+        }
+
         var date = moment().format('HH:mm:ss SSS');
 
-        messages.push({ timestamp: date, command: message.command, args: message.args || [] });
+        channel.messages.push({ timestamp: date, command: message.command, args: message.args || [] });
 
-        this.setState({ messages: messages });
+        this.setState({ channels: channels });
     }
 
     processCommand(commandLine) {
@@ -107,10 +126,12 @@ class Application extends React.Component {
     }
 
     render() {
-        return (<MainWindow messages={ this.state.messages } channels={ this.state.channels } onCommand={ this.onCommand } />);
+        return (<MainWindow channels={ this.state.channels } onCommand={ this.onCommand } />);
     }
 }
 
-ReactDOM.render(<Application />, document.getElementById('component'));
+if(!window.testing) {
+    ReactDOM.render(<Application />, document.getElementById('component'));
+}
 
 Application.displayName = 'Application';

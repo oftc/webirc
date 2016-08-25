@@ -20,6 +20,7 @@
     "react": "^15.3.0",
     "socket.io-client": "^1.4.8",
     "ircng": "*",
-    "moment": "^2.14.1"
+    "moment": "^2.14.1",
+    "underscore": "^1.8.3"
   }
 }

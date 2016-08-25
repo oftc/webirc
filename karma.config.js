@@ -17,13 +17,14 @@ module.exports = function(config) {
             'node_modules/socket.io-client/socket.io.js',
             'bower_components/jquery/dist/jquery.js',
             'bower_components/moment/moment.js',
+            'bower_components/underscore/underscore.js',
             'spec/test-setup.js',
             'client/CommandBar.jsx',
             'client/TextWindow.jsx',
             'client/ChannelList.jsx',
             'client/MainWindow.jsx',
-            'client/Application.jsx',
-            'spec/**/*.jsx'
+            'spec/**/*.jsx',
+            'client/Application.jsx'
         ],
         // list of files to exclude
         exclude: [

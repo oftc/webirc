@@ -1,5 +1,3 @@
-'use strict';
-
 var generateCommonJSModule = require('./bower_components/bootstrap/grunt/bs-commonjs-generator.js');
 
 module.exports = function(grunt) {
@@ -8,10 +6,10 @@ module.exports = function(grunt) {
     bspkg: grunt.file.readJSON('bower_components/bootstrap/package.json'),
     bspath: 'bower_components/bootstrap',
     banner: '/*!\n' +
-            ' * Bootstrap v<%= bspkg.version %> (<%= bspkg.homepage %>)\n' +
-            ' * Copyright 2011-<%= grunt.template.today("yyyy") %> <%= bspkg.author %>\n' +
-            ' * Licensed under <%= bspkg.license.type %> (<%= bspkg.license.url %>)\n' +
-            ' */\n',
+    ' * Bootstrap v<%= bspkg.version %> (<%= bspkg.homepage %>)\n' +
+    ' * Copyright 2011-<%= grunt.template.today("yyyy") %> <%= bspkg.author %>\n' +
+    ' * Licensed under <%= bspkg.license.type %> (<%= bspkg.license.url %>)\n' +
+    ' */\n',
     babel: {
       options: {
         sourceMap: true
@@ -19,8 +17,8 @@ module.exports = function(grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '.',
-          src: ['client/*.jsx'],
+          cwd: 'client',
+          src: ['*.jsx'],
           dest: 'public/js/',
           ext: '.js',
         }]
@@ -49,44 +47,47 @@ module.exports = function(grunt) {
           src: 'jquery.js',
           dest: 'public/js'
         },
-        {
-          expand: true,
-          cwd: 'bower_components/bootstrap/fonts',
-          src: '*',
-          dest: 'public/fonts'
-        },
-        {
-          expand: true,
-          cwd: 'bower_components/react',
-          src: ['react.js', 'react-dom.js'],
-          dest: 'public/js'
-        },
-        {
-          expand: true,
-          cwd: 'bower_components/socket.io-client/',
-          src: ['socket.io.js'],
-          dest: 'public/js/'
-        },
-        {
-          expand: true,
-          cwd: 'bower_components/ircng/dist/',
-          src: ['ircng.js'],
-          dest: 'public/js/'
-        },
-        { expand: true,
-          cwd: 'bower_components/moment/',
-          src: ['moment.js'],
-          dest: 'public/js/'
-        }]
+          {
+            expand: true,
+            cwd: 'bower_components/bootstrap/fonts',
+            src: '*',
+            dest: 'public/fonts'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/react',
+            src: ['react.js', 'react-dom.js'],
+            dest: 'public/js'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/underscore',
+            src: 'underscore.js',
+            dest: 'public/js'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/socket.io-client/',
+            src: ['socket.io.js'],
+            dest: 'public/js/'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/ircng/dist/',
+            src: ['ircng.js'],
+            dest: 'public/js/'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/moment/',
+            src: ['moment.js'],
+            dest: 'public/js/'
+          }]
       }
     },
     watch: {
       jsx: {
         files: 'client/**/*.jsx',
-        tasks: ['babel']
-      },
-      jsxTest: {
-        files: 'test/**/*.jsx',
         tasks: ['babel']
       },
       less: {
