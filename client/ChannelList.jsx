@@ -1,14 +1,33 @@
 /*global React */
 
 class ChannelList extends React.Component {
+    constructor() {
+        super();
+
+        this.onSelected = this.onSelected.bind(this);
+    }
+
+    onSelected(channel) {
+        if(channel.selected) {
+            return;
+        }
+
+        if(this.props.onSelected) {
+            this.props.onSelected(channel.key);
+        }    
+    }
+
     render() {
         var channels = [];
 
-        this.props.channels.forEach(function(channel) {
-            var className = channel.selected ? 'active' : '';
-
-            channels.push(<li key={ channel.name } className='{ className }'><a href='#'>{ channel.name }</a></li>);
-        });
+        if(!_.isEmpty(this.props.channels)) {
+            _.each(this.props.channels, (channel, key) => {
+                channels.push(
+                    <li key={ key } className={ channel.selected ? 'active' : '' }>
+                        <a href='#' onClick={ () => this.onSelected(channel) }>{ channel.name }</a>
+                    </li>);
+            });
+        }
 
         return (
             <div className='channel-list col-md-2 sidebar'>
@@ -21,5 +40,6 @@ class ChannelList extends React.Component {
 
 ChannelList.displayName = 'ChannelList';
 ChannelList.propTypes = {
-    channels: React.PropTypes.array
+    channels: React.PropTypes.array,
+    onSelected: React.PropTypes.func
 };

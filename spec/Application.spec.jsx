@@ -7,7 +7,7 @@ window.testing = true;
 describe('the Application component', function() {
     var component;
     var socketMock = { on: function() { } };
-    
+
     document.stubComponent(MainWindow);
     document.stubComponent(ChannelList);
 
@@ -129,6 +129,37 @@ describe('the Application component', function() {
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
                 expect(component.state.channels['#test'].name).toBe('#test');
+            });
+        });
+    });
+
+    describe('onChannelSelected', function() {
+        describe('when channel not selected', function() {
+            it('should set the channel to be selected', function() {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ channel: 'test' });
+                component.onJoin({ channel: 'test2' });
+
+                component.onChannelSelected('test');
+
+                expect(component.state.channels['test'].selected).toBe(true);
+                expect(component.state.channels['test2'].selected).toBe(false);
+            });
+        });
+
+        describe('when new channel selected', function() {
+            it('should set the new channel selected and all others unselected', function() {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ channel: 'test' });
+                component.onJoin({ channel: 'test2' });
+
+                component.onChannelSelected('test');
+                component.onChannelSelected('test2');
+
+                expect(component.state.channels['test'].selected).not.toBe(true);
+                expect(component.state.channels['test2'].selected).toBe(true);
             });
         });
     });

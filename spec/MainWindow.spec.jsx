@@ -17,17 +17,18 @@ describe('the <MainWindow /> component', function() {
 
             expect(channelList.length).toBe(1);
             expect(footer.length).toBe(1);
-            expect(_.isArray(channelList[0].props.channels)).toBe(true);
         });
     });
 
     describe('when rendered with channels', function() {
-        it('should render one text window for each channel', function() {
-            component = TestUtils.renderIntoDocument(<MainWindow channels={ { status: { name: 'Status' }, test: { name: 'Test' } } } />);
+        it('should render the text window for the selected channel', function() {
+            var messages = ['1', '2'];
+            component = TestUtils.renderIntoDocument(
+                <MainWindow channels={ { status: { name: 'Status', messages: [] }, test: { name: 'Test', selected: true, messages: messages } } } />);
 
             var textWindows = TestUtils.scryRenderedComponentsWithType(component, TextWindow);
-
-            expect(textWindows.length).toBe(2);
+            
+            expect(textWindows[0].props.messages).toBe(messages);
         });
     });
 });

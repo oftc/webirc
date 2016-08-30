@@ -8,6 +8,7 @@ class Application extends React.Component {
 
         this.onMessage = this.onMessage.bind(this);
         this.onJoin = this.onJoin.bind(this);
+        this.onChannelSelected = this.onChannelSelected.bind(this);
         this.onCommand = this.onCommand.bind(this);
         this.processCommand = this.processCommand.bind(this);
 
@@ -15,7 +16,8 @@ class Application extends React.Component {
             channels: {
                 'status': {
                     name: 'Status',
-                    messages: []
+                    messages: [],
+                    selected: true
                 }
             }
         };
@@ -64,7 +66,7 @@ class Application extends React.Component {
     onJoin(joinMessage) {
         var channels = this.state.channels;
 
-        channels[joinMessage.channel] = { name: joinMessage.channel };
+        channels[joinMessage.channel.toLowerCase()] = { name: joinMessage.channel };
 
         this.setState({ channels: channels });
     }
@@ -119,6 +121,18 @@ class Application extends React.Component {
         return true;
     }
 
+    onChannelSelected(channel) {
+        var channels = this.state.channels;
+
+        _.each(channels, function(c) {
+            c.selected = false;
+        });
+
+        channels[channel].selected = true;
+
+        this.setState({ channels: channels });
+    }
+
     onCommand(command) {
         if(command[0] === '/') {
             this.processCommand(command.slice(1));
@@ -126,7 +140,7 @@ class Application extends React.Component {
     }
 
     render() {
-        return (<MainWindow channels={ this.state.channels } onCommand={ this.onCommand } />);
+        return (<MainWindow channels={ this.state.channels } onCommand={ this.onCommand } onChannelSelected={ this.onChannelSelected } />);
     }
 }
 
