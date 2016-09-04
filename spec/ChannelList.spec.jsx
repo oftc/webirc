@@ -17,7 +17,8 @@ describe('the <ChannelList /> component', function() {
 
     describe('when channels are provided', function() {
         it('should render list items for each channel', function() {
-            component = TestUtils.renderIntoDocument(<ChannelList channels={[{ key: 'test1', name: 'Test1' }, { key: 'test2', name: 'Test2' }]} />);
+            component = TestUtils.renderIntoDocument(
+                <ChannelList channels={[{ key: 'test1', name: 'Test1' }, { key: 'test2', name: 'Test2' }]} />);
 
             var listItems = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
 
@@ -29,7 +30,8 @@ describe('the <ChannelList /> component', function() {
 
     describe('when a channel is selected', function() {
         it('should mark the selected channel as active', function() {
-            component = TestUtils.renderIntoDocument(<ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]} />);
+            component = TestUtils.renderIntoDocument(
+                <ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]} />);
 
             var listItems = TestUtils.scryRenderedDOMComponentsWithClass(component, 'active');
 
@@ -41,7 +43,8 @@ describe('the <ChannelList /> component', function() {
     describe('when a list item is clicked on', function() {
         describe('and there is no callback defined', function() {
             it('should not try to callback', function() {
-                component = TestUtils.renderIntoDocument(<ChannelList channels={[{ key: 'test1', name: 'Test1' }, { key: 'test2', name: 'Test2' }]} />);
+                component = TestUtils.renderIntoDocument(
+                    <ChannelList channels={[{ key: 'test1', name: 'Test1' }, { key: 'test2', name: 'Test2' }]} />);
 
                 var listItems = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
                 var linkNode = listItems[0].firstChild;
@@ -56,7 +59,9 @@ describe('the <ChannelList /> component', function() {
 
                 spyOn(selectedSpy, 'selected');
 
-                component = TestUtils.renderIntoDocument(<ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]} onSelected={ selectedSpy.selected } />);
+                component = TestUtils.renderIntoDocument(
+                    <ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]}
+                                 onSelected={ selectedSpy.selected } />);
 
                 var listItems = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
                 var linkNode = listItems[0].firstChild;
@@ -72,7 +77,9 @@ describe('the <ChannelList /> component', function() {
 
                 spyOn(selectedSpy, 'selected');
 
-                component = TestUtils.renderIntoDocument(<ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]} onSelected={ selectedSpy.selected } />);
+                component = TestUtils.renderIntoDocument(
+                    <ChannelList channels={[{ key: 'test1', name: 'Test1', selected: true }, { key: 'test2', name: 'Test2' }]}
+                                 onSelected={ selectedSpy.selected } />);
 
                 var listItems = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li');
                 var linkNode = listItems[1].firstChild;
