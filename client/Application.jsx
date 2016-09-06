@@ -15,6 +15,7 @@ class Application extends React.Component {
         this.state = {
             channels: {
                 'status': {
+                    key: 'status',
                     name: 'Status',
                     messages: [],
                     selected: true
@@ -65,8 +66,9 @@ class Application extends React.Component {
 
     onJoin(joinMessage) {
         var channels = this.state.channels;
+        var channelKey = joinMessage.channel.toLowerCase(); 
 
-        channels[joinMessage.channel.toLowerCase()] = { name: joinMessage.channel };
+        channels[channelKey] = { key: channelKey, name: joinMessage.channel };
 
         this.setState({ channels: channels });
     }
