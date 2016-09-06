@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Mon Aug 22 2016 08:59:26 GMT+0100 (BST)
 
-module.exports = function(config) {
+module.exports = function (config) {
     config.set({
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
@@ -34,7 +34,7 @@ module.exports = function(config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             'bower_components/ircng/dist/ircng.js': ['babel'],
-            'client/**/*.jsx': ['babel'],
+            'client/**/*.jsx': ['babel', 'coverage', 'sourcemap'],
             'spec/**/*.jsx': ['babel']
         },
 
@@ -48,7 +48,24 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ['progress', 'coverage'],
+
+        coverageReporter: {
+            instrumenters: { isparta: require('isparta') },
+            instrumenter: {
+                'client/*.jsx': 'isparta'
+            },
+
+            reporters: [
+                {
+                    type: 'text-summary',
+                },
+                {
+                    type: 'html',
+                    dir: 'coverage/',
+                }
+            ]
+        },
 
         // web server port
         port: 9876,
