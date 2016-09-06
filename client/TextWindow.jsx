@@ -1,6 +1,10 @@
-/*global React */
+import React from 'react';
 
 class TextWindow extends React.Component {
+    constructor() {
+        super();
+    }
+
     componentDidUpdate() {
         this.updateScroll();
     }
@@ -36,3 +40,5 @@ TextWindow.displayName = 'TextWindow';
 TextWindow.propTypes = {
     messages: React.PropTypes.array.isRequired
 };
+
+export default TextWindow;

@@ -1,4 +1,8 @@
-/*global React, ChannelList, TextWindow, CommandBar */
+import React from 'react';
+import ChannelList from './ChannelList.jsx';
+import TextWindow from './TextWindow.jsx';
+import CommandBar from './CommandBar.jsx';
+
 
 class MainWindow extends React.Component {
     constructor() {
@@ -47,3 +51,5 @@ MainWindow.propTypes = {
     onChannelSelected: React.PropTypes.func,
     onCommand: React.PropTypes.func
 };
+
+export default MainWindow;

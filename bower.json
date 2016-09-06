@@ -16,11 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.7",
-    "react": "^15.3.0",
-    "socket.io-client": "^1.4.8",
-    "ircng": "*",
-    "moment": "^2.14.1",
-    "underscore": "^1.8.3"
+    "bootstrap": "^3.3.7"
   }
 }

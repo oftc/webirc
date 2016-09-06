@@ -1,4 +1,5 @@
-/*global React */
+import React from 'react';
+import _ from 'underscore';
 
 class ChannelList extends React.Component {
     constructor() {
@@ -40,6 +41,8 @@ class ChannelList extends React.Component {
 
 ChannelList.displayName = 'ChannelList';
 ChannelList.propTypes = {
-    channels: React.PropTypes.array,
+    channels: React.PropTypes.object,
     onSelected: React.PropTypes.func
 };
+
+export default ChannelList;

@@ -1,6 +1,9 @@
-/*global React, MainWindow */
-
-var IRCStream = require('ircng');
+import React from 'React';
+import IRCStream from 'ircng';
+import {render} from 'react-dom';
+import MainWindow from './MainWindow.jsx';
+import io from 'socket.io-client'
+import moment from 'moment';
 
 class Application extends React.Component {
     constructor() {
@@ -147,7 +150,7 @@ class Application extends React.Component {
 }
 
 if(!window.testing) {
-    ReactDOM.render(<Application />, document.getElementById('component'));
+    render(<Application />, document.getElementById('component'));
 }
 
 Application.displayName = 'Application';

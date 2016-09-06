@@ -1,4 +1,4 @@
-/*global React */
+import React from 'react';
 
 class CommandBar extends React.Component {
     constructor() {
@@ -34,3 +34,5 @@ CommandBar.displayName = 'CommandBar';
 CommandBar.propTypes = {
     onCommand: React.PropTypes.func
 };
+
+export default CommandBar;
