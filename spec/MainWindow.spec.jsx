@@ -1,12 +1,15 @@
-/*global React, MainWindow */
-
-var TestUtils = React.addons.TestUtils;
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+import MainWindow from './../client/MainWindow.jsx';
+import ChannelList from './../client/ChannelList.jsx';
+import TextWindow from './../client/TextWindow.jsx';
+import stubComponent from './test-setup.js';
 
 describe('the <MainWindow /> component', function() {
     var component;
 
-    document.stubComponent(ChannelList);
-    document.stubComponent(TextWindow);
+    stubComponent(ChannelList);
+    stubComponent(TextWindow);
 
     describe('when initially rendered', function() {
         it('should render a channel list, and a footer', function() {

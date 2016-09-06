@@ -1,4 +1,7 @@
-/*global React, TextWindow */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TextWindow from './../client/TextWindow.jsx';
+import TestUtils from 'react-addons-test-utils';
 
 describe('The TextWindow component', function() {
     var node, component;

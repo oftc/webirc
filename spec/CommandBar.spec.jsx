@@ -1,6 +1,6 @@
-/*global React, CommandBar */
-
-var TestUtils = React.addons.TestUtils;
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+import CommandBar from './../client/CommandBar.jsx'
 
 describe('The CommandBar Component', function() {
     var component;

@@ -3,7 +3,7 @@ container.id = 'component';
 
 document.body.appendChild(container);
 
-document.stubComponent = function(componentClass) {
+var stubComponent = function(componentClass) {
     var originalPropTypes;
 
     beforeEach(function() {
@@ -45,3 +45,5 @@ document.stubComponent = function(componentClass) {
         componentClass.propTypes = originalPropTypes;
     });
 };
+
+export default stubComponent;

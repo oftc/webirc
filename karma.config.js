@@ -1,95 +1,58 @@
-// Karma configuration
-// Generated on Mon Aug 22 2016 08:59:26 GMT+0100 (BST)
+var webpack = require('webpack');
 
 module.exports = function (config) {
     config.set({
-        // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
-        // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
-        // list of files / patterns to load in the browser
         files: [
-            'bower_components/ircng/dist/ircng.js',
-            'node_modules/react/dist/react-with-addons.js',
-            'node_modules/react-dom/dist/react-dom.js',
-            'node_modules/socket.io-client/socket.io.js',
-            'bower_components/jquery/dist/jquery.js',
-            'bower_components/moment/moment.js',
-            'bower_components/underscore/underscore.js',
-            'spec/test-setup.js',
-            'client/CommandBar.jsx',
-            'client/TextWindow.jsx',
-            'client/ChannelList.jsx',
-            'client/MainWindow.jsx',
-            'spec/**/*.jsx',
-            'client/Application.jsx'
-        ],
-        // list of files to exclude
-        exclude: [
+            'spec/tests.webpack.js'
         ],
 
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'bower_components/ircng/dist/ircng.js': ['babel'],
-            'client/**/*.jsx': ['babel', 'coverage', 'sourcemap'],
-            'spec/**/*.jsx': ['babel']
+            'spec/tests.webpack.js': ['webpack', 'sourcemap']
         },
 
-        babelPreprocessor: {
-            options: {
-                presets: ['react', 'es2015'],
-                sourceMap: 'inline'
+        reporters: ['dots', 'coverage'],
+
+        webpack: {
+            devtool: 'inline-source-map',
+
+            module: {
+                loaders: [
+                    {
+                        test: /\.jsx?/,
+                        loader: 'babel'
+                    }
+                ],
+                postLoaders: [{
+                    test: /\.jsx$/,
+                    exclude: /(spec|node_modules|bower_components)\//,
+                    loader: 'istanbul-instrumenter'
+                }]
             }
         },
-
-        // test results reporter to use
-        // possible values: 'dots', 'progress'
-        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage'],
-
-        coverageReporter: {
-            instrumenters: { isparta: require('isparta') },
-            instrumenter: {
-                'client/*.jsx': 'isparta'
-            },
-
-            reporters: [
-                {
-                    type: 'text-summary',
-                },
-                {
-                    type: 'html',
-                    dir: 'coverage/',
-                }
-            ]
+        webpackMiddleware: {
+            noInfo: true
         },
 
-        // web server port
+        coverageReporter: {
+            type: 'html',
+            dir: 'coverage/'
+        },
+
         port: 9876,
 
-        // enable / disable colors in the output (reporters and logs)
         colors: true,
 
-        // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
 
-        // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
 
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['PhantomJS'],
 
-        // Continuous Integration mode
-        // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
 
-        // Concurrency level
-        // how many browser should be started simultaneous
         concurrency: Infinity
     })
 }

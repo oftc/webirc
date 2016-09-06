@@ -1,15 +1,18 @@
-/*global React, Application */
-
-var IRCStream = require('ircng');
-
-window.testing = true;
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+import Application from './../client/Application.jsx'
+import MainWindow from './../client/MainWindow.jsx';
+import ChannelList from './../client/ChannelList.jsx';
+import stubComponent from './test-setup.js';
+import IRCStream from 'ircng';
+import io from 'socket.io-client'
 
 describe('the Application component', function() {
     var component;
     var socketMock = { on: function() { } };
 
-    document.stubComponent(MainWindow);
-    document.stubComponent(ChannelList);
+    stubComponent(MainWindow);
+    stubComponent(ChannelList);
 
     beforeEach(function() {
         spyOn(io, 'connect').and.returnValue(socketMock);

@@ -4,6 +4,7 @@ import {render} from 'react-dom';
 import MainWindow from './MainWindow.jsx';
 import io from 'socket.io-client'
 import moment from 'moment';
+import _ from 'underscore';
 
 class Application extends React.Component {
     constructor() {
@@ -34,7 +35,7 @@ class Application extends React.Component {
         var nickAttempts = 1;
 
         this.stream.on('message', this.onMessage);
-        this.stream.on('send', function(message) {
+        this.stream.on('send', function (message) {
             socket.emit('message', message.message);
         });
 
@@ -45,7 +46,7 @@ class Application extends React.Component {
             nickAttempts++;
         });
 
-        socket.on('error', function(error) {
+        socket.on('error', function (error) {
             console.log('socket Error: ' + error);
         });
 
@@ -58,18 +59,18 @@ class Application extends React.Component {
             console.info('connected');
         });
 
-        socket.on('disconnect', function() {
+        socket.on('disconnect', function () {
             console.info('disconnected');
         });
 
-        window.onbeforeunload = function(e) {
+        window.onbeforeunload = function (e) {
             socket.disconnect();
         }
     }
 
     onJoin(joinMessage) {
         var channels = this.state.channels;
-        var channelKey = joinMessage.channel.toLowerCase(); 
+        var channelKey = joinMessage.channel.toLowerCase();
 
         channels[channelKey] = { key: channelKey, name: joinMessage.channel };
 
@@ -77,19 +78,19 @@ class Application extends React.Component {
     }
 
     onMessage(message) {
-        if(!message || !message.command) {
+        if (!message || !message.command) {
             return;
         }
 
         var channels = this.state.channels;
         var channel = {};
 
-        if(!message.target) {
+        if (!message.target) {
             channel = channels.status;
         } else {
             channel = channels[message.target];
 
-            if(!channel) {
+            if (!channel) {
                 channel = { messages: [] };
                 channels[message.target] = channel;
             }
@@ -103,7 +104,7 @@ class Application extends React.Component {
     }
 
     processCommand(commandLine) {
-        if(!commandLine) {
+        if (!commandLine) {
             return false;
         }
 
@@ -111,9 +112,9 @@ class Application extends React.Component {
 
         var command = split[0];
 
-        switch(command.toUpperCase()) {
+        switch (command.toUpperCase()) {
             case 'JOIN':
-                if(split.length < 2) {
+                if (split.length < 2) {
                     return false;
                 }
 
@@ -129,7 +130,7 @@ class Application extends React.Component {
     onChannelSelected(channel) {
         var channels = this.state.channels;
 
-        _.each(channels, function(c) {
+        _.each(channels, function (c) {
             c.selected = false;
         });
 
@@ -139,7 +140,7 @@ class Application extends React.Component {
     }
 
     onCommand(command) {
-        if(command[0] === '/') {
+        if (command[0] === '/') {
             this.processCommand(command.slice(1));
         }
     }
@@ -149,8 +150,10 @@ class Application extends React.Component {
     }
 }
 
-if(!window.testing) {
+if (!window.__karma__) {
     render(<Application />, document.getElementById('component'));
 }
 
 Application.displayName = 'Application';
+
+export default Application;
