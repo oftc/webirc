@@ -15,13 +15,17 @@ class Application extends React.Component {
         this.onChannelSelected = this.onChannelSelected.bind(this);
         this.onCommand = this.onCommand.bind(this);
         this.processCommand = this.processCommand.bind(this);
+        this.onPrivmsg = this.onPrivmsg.bind(this);
+        this.on353Numeric = this.on353Numeric.bind(this);
 
         this.state = {
+            nickname: 'WebIRC',
             channels: {
                 'status': {
                     key: 'status',
                     name: 'Status',
                     messages: [],
+                    users: [],
                     selected: true
                 }
             }
@@ -34,15 +38,21 @@ class Application extends React.Component {
         var socket = io.connect('https://webirc.oftc.net:8443');
         var nickAttempts = 1;
 
+        this.stream.setNickname(this.state.nickname);
+
         this.stream.on('message', this.onMessage);
         this.stream.on('send', function (message) {
             socket.emit('message', message.message);
         });
 
         this.stream.on('join', this.onJoin);
+        this.stream.on('privmsg', this.onPrivmsg);
+
+        this.stream.on('353', this.on353Numeric);
 
         this.stream.on('433', message => {
-            this.stream.setNickname('WebIRC' + nickAttempts);
+            this.setState({ nickname: this.state.nickname + nickAttempts });
+            this.stream.setNickname(this.state.nickname);
             nickAttempts++;
         });
 
@@ -71,8 +81,14 @@ class Application extends React.Component {
     onJoin(joinMessage) {
         var channels = this.state.channels;
         var channelKey = joinMessage.channel.toLowerCase();
+        var source = joinMessage.source.substr(0, joinMessage.source.indexOf('!'));
 
-        channels[channelKey] = { key: channelKey, name: joinMessage.channel };
+        if(source === this.state.nickname) {
+            channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [] };
+        } else {
+            this.addMessageToChannel(channelKey, '', [joinMessage.source + ' has joined ' + channelKey]);
+            channels[channelKey].users.push(source);
+        }
 
         this.setState({ channels: channels });
     }
@@ -82,23 +98,63 @@ class Application extends React.Component {
             return;
         }
 
-        var channels = this.state.channels;
-        var channel = {};
+        var target = '';
 
         if (!message.target) {
-            channel = channels.status;
+            target = 'status';
         } else {
-            channel = channels[message.target];
+            target = message.target;
+        }
 
-            if (!channel) {
-                channel = { messages: [] };
-                channels[message.target] = channel;
-            }
+        this.addMessageToChannel(target, message.command, message.args);
+    }
+
+    addMessageToChannel(channelKey, command, args) {
+        var channels = this.state.channels;
+        var channel = channels[channelKey];
+
+        if (!channel) {
+            channel = { key: channelKey, name: channelKey, messages: [] };
+            channels[channelKey] = channel;
         }
 
         var date = moment().format('HH:mm:ss SSS');
 
-        channel.messages.push({ timestamp: date, command: message.command, args: message.args || [] });
+        channel.messages.push({ timestamp: date, command: command, args: args || [] });
+        this.setState({ channels: channels });
+    }
+
+    onPrivmsg(message) {
+        if (!message) {
+            return;
+        }
+
+        var source = message.source.substr(0, message.source.indexOf('!'));
+        var target = '';
+
+        if (message.target[0] === '#') {
+            target = message.target;
+        } else if (message.target !== this.state.nickname) {
+            target = 'status';
+        } else {
+            target = source;
+        }
+
+        this.addMessageToChannel(target, '', [message.source + ' [' + message.message + ']']);
+    }
+
+    on353Numeric(message) {
+        if (!message) {
+            return;
+        }
+
+        var channelKey = message.args[2];
+        var channels = this.state.channels;
+
+        var channel = channels[channelKey];
+
+        var users = message.args[3].split(' ');
+        channel.users = _.union(channel.users, users);
 
         this.setState({ channels: channels });
     }

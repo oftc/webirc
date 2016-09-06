@@ -25,11 +25,11 @@ module.exports = function (config) {
                         loader: 'babel'
                     }
                 ],
-                postLoaders: [{
-                    test: /\.jsx$/,
-                    exclude: /(spec|node_modules|bower_components)\//,
-                    loader: 'istanbul-instrumenter'
-                }]
+                // postLoaders: [{
+                //     test: /\.jsx$/,
+                //     exclude: /(spec|node_modules|bower_components)\//,
+                //     loader: 'istanbul-instrumenter'
+                // }]
             }
         },
         webpackMiddleware: {
