@@ -6,11 +6,11 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         files: [
-            'spec/tests.webpack.js'
+            'test/tests.webpack.js'
         ],
 
         preprocessors: {
-            'spec/tests.webpack.js': ['webpack', 'sourcemap']
+            'test/tests.webpack.js': ['webpack', 'sourcemap']
         },
 
         reporters: ['dots', 'coverage'],
