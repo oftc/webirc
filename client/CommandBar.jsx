@@ -24,7 +24,7 @@ class CommandBar extends React.Component {
 
     render() {
         return (
-            <div className='col-md-offset-2'>
+            <div className='col-md-offset-2 col-md-9 command-bar'>
                 <input ref='CommandBarInput' className='command-bar' type='text' onKeyPress={ this.onKeyPress } onChange={ this.onChange } value={ this.state.command } />
             </div>);
     }

@@ -14,8 +14,8 @@ class UserList extends React.Component {
         });
 
         return (
-            <div className='col-md-2 pull-right'>
-                <ul>
+            <div className='user-list col-md-1'>
+                <ul className='nav text-right'>
                     { users }
                 </ul>
             </div>);

@@ -1,26 +1,45 @@
-var express = require('express');
+const path = require('path');
+const express = require('express');
+const webpack = require('webpack');
+const webpackMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const config = require('./webpack.config.js');
 
-var app = express();
-var path = require('path');
+const isDeveloping = process.env.NODE_ENV !== 'production';
+const port = isDeveloping ? 3000 : process.env.PORT;
+const app = express();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+if (isDeveloping) {
+    const compiler = webpack(config);
+    const middleware = webpackMiddleware(compiler, {
+        publicPath: config.output.publicPath,
+        contentBase: 'client',
+        stats: {
+            colors: true,
+            hash: false,
+            timings: true,
+            chunks: false,
+            chunkModules: false,
+            modules: false
+        }
+    });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+    app.use(middleware);
+    app.use(webpackHotMiddleware(compiler));
+    app.get('*', function response(req, res) {
+        res.write(middleware.fileSystem.readFileSync(path.join(__dirname, 'public/index.html')));
+        res.end();
+    });
+} else {
+    app.use(express.static(__dirname + '/dist'));
+    app.get('*', function response(req, res) {
+        res.render('index', { title: 'Home', menu: 'Home' });
     });
 }
 
-app.get('/', function (req, res) {
-    res.render('index', { title: 'Home', menu: 'Home' });
-});
-
-app.listen(3000, function () {
+app.listen(port, '0.0.0.0', function onStart(err) {
+    if (err) {
+        console.log(err);
+    }
+    console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
 });

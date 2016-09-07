@@ -1,57 +1,87 @@
-/*!
- * Bootstrap v3.3.6 (http://getbootstrap.com)
- * Copyright 2011-2015 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- */
+@import "~bootstrap/less/bootstrap";
 
-// Core variables and mixins
-@import "variables.less";
-@import "mixins.less";
+body, html {
+  overflow: hidden;
+}
 
-// Reset and dependencies
-@import "normalize.less";
-@import "print.less";
-@import "glyphicons.less";
+body {
+  padding-top: 50px;
+  background-color: #1E1E1E;
+  color: #C1C2C3
+}
 
-// Core CSS
-@import "scaffolding.less";
-@import "type.less";
-@import "code.less";
-@import "grid.less";
-@import "tables.less";
-@import "forms.less";
-@import "buttons.less";
+.nav-sidebar {
+  margin-right: -21px; /* 20px padding + 1px border */
+  margin-bottom: 20px;
+  margin-left: -20px;
+}
+.nav-sidebar > li > a {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+.nav-sidebar > .active > a,
+.nav-sidebar > .active > a:hover,
+.nav-sidebar > .active > a:focus {
+  background-color: #428bca;
+  color: white;
+}
 
-// Components
-@import "component-animations.less";
-@import "dropdowns.less";
-@import "button-groups.less";
-@import "input-groups.less";
-@import "navs.less";
-@import "navbar.less";
-@import "breadcrumbs.less";
-@import "pagination.less";
-@import "pager.less";
-@import "labels.less";
-@import "badges.less";
-@import "jumbotron.less";
-@import "thumbnails.less";
-@import "alerts.less";
-@import "progress-bars.less";
-@import "media.less";
-@import "list-group.less";
-@import "panels.less";
-@import "responsive-embed.less";
-@import "wells.less";
-@import "close.less";
+.navbar-inverse {
+  border-color: #555555;
+}
 
-// Components w/ JavaScript
-@import "modals.less";
-@import "tooltip.less";
-@import "popovers.less";
-@import "carousel.less";
+input.command-bar {
+  width: 100%;
+  background-color: #333333;
+  border-color: #555555;
+  border-style: solid;
+  color: #C1C2C3
+}
 
-// Utility classes
-@import "utilities.less";
-@import "responsive-utilities.less";
-@import "site-overrides.less";
+div.command-bar {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.text-window {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  top: 50px;
+  color: #C1C2C3;
+  overflow-y: auto;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+}
+
+.channel-list {
+  position: fixed;
+  top: 51px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-right: 1px solid #555555;
+  background-color: #252526;
+}
+
+.user-list {
+  position: fixed;
+  top: 51px;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-left: 1px solid #555555;
+  background-color: #252526;  
+}
