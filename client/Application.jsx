@@ -17,6 +17,8 @@ class Application extends React.Component {
         this.processCommand = this.processCommand.bind(this);
         this.onPrivmsg = this.onPrivmsg.bind(this);
         this.on353Numeric = this.on353Numeric.bind(this);
+        this.onPart = this.onPart.bind(this);
+        this.onQuit = this.onQuit.bind(this);
 
         this.state = {
             nickname: 'WebIRC',
@@ -46,6 +48,8 @@ class Application extends React.Component {
         });
 
         this.stream.on('join', this.onJoin);
+        this.stream.on('part', this.onPart);
+        this.stream.on('quit', this.onQuit);
         this.stream.on('privmsg', this.onPrivmsg);
 
         this.stream.on('353', this.on353Numeric);
@@ -83,14 +87,71 @@ class Application extends React.Component {
         var channelKey = joinMessage.channel.toLowerCase();
         var source = joinMessage.source.substr(0, joinMessage.source.indexOf('!'));
 
-        if(source === this.state.nickname) {
+        if (source === this.state.nickname) {
             channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [] };
+            _.each(channels, function (channel) {
+                channel.selected = false;
+            });
+
+            channels[channelKey].selected = true;
         } else {
             this.addMessageToChannel(channelKey, '', [joinMessage.source + ' has joined ' + channelKey]);
             channels[channelKey].users.push(source);
         }
 
         this.setState({ channels: channels });
+    }
+
+    onPart(partMessage) {
+        if (!partMessage) {
+            return;
+        }
+
+        var channels = this.state.channels;
+        var channelKey = partMessage.channel.toLowerCase();
+
+        var source = partMessage.source.substr(0, partMessage.source.indexOf('!'));
+
+        if (source === this.state.nickname) {
+            delete channels[channelKey];
+
+            _.each(channels, function (channel) {
+                channel.selected = false;
+            });
+
+            channels.status.selected = true;
+        } else {
+            var channel = channels[channelKey];
+            channel.users = _.reject(channel.users, function (user) {
+                return user === source;
+            });
+
+            this.addMessageToChannel(channelKey, '', [partMessage.source + ' has left ' + channelKey]);
+        }
+
+        this.setState({ channels: channels });
+    }
+
+    onQuit(quitMessage) {
+        if (!quitMessage) {
+            return;
+        }
+
+        var source = quitMessage.source.substr(0, quitMessage.source.indexOf('!'));
+
+        _.each(this.state.channels, channel => {
+            var matchingUser = _.find(channel.users, function(user) {
+                return user === source;
+            });
+
+            if(!matchingUser) {
+                return;
+            }
+
+            channel.users = _.without(channel.users, matchingUser);
+
+            this.addMessageToChannel(channel.key, '', [quitMessage.source + ' has quit: ' + quitMessage.message || '']);
+        });
     }
 
     onMessage(message) {
@@ -165,7 +226,6 @@ class Application extends React.Component {
         }
 
         var split = commandLine.split(' ');
-
         var command = split[0];
 
         switch (command.toUpperCase()) {
@@ -175,6 +235,29 @@ class Application extends React.Component {
                 }
 
                 this.stream.joinChannel(split[1]);
+                break;
+            case 'PART':
+                var channel = '';
+
+                if (split.length < 2) {
+                    if (this.state.channels.status.selected) {
+                        return false;
+                    }
+
+                    channel = _.find(this.state.channels, function (c) {
+                        return c.selected;
+                    }).name;
+                } else {
+                    if (!_.any(this.state.channels, function (c) {
+                        return c.name.toLowerCase() === split[1].toLowerCase();
+                    })) {
+                        return false;
+                    } else {
+                        channel = split[1].toLowerCase();
+                    }
+                }
+
+                this.stream.leaveChannel(channel);
                 break;
             default:
                 return false;

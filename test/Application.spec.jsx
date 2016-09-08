@@ -102,16 +102,18 @@ describe('the Application component', function () {
         describe('that is JOIN', function () {
             describe('with no parameters', function () {
                 it('should return false', function () {
+                    spyOn(IRCStream.prototype, 'joinChannel');
                     component = TestUtils.renderIntoDocument(<Application />);
 
                     var ret = component.processCommand('JOIN');
 
                     expect(ret).toBe(false);
+                    expect(IRCStream.prototype.joinChannel).not.toHaveBeenCalled();
                 });
             });
 
             describe('with a parameter', function () {
-                it('joins the requested channel', function () {
+                it('should join the requested channel', function () {
                     spyOn(IRCStream.prototype, 'joinChannel');
                     component = TestUtils.renderIntoDocument(<Application />);
 
@@ -121,6 +123,76 @@ describe('the Application component', function () {
                     expect(IRCStream.prototype.joinChannel).toHaveBeenCalled();
                 })
             })
+        });
+
+        describe('that is PART', function () {
+            describe('with no paramters and in the status window', function () {
+                it('should return false', function () {
+                    spyOn(IRCStream.prototype, 'leaveChannel');
+                    component = TestUtils.renderIntoDocument(<Application />);
+
+                    var ret = component.processCommand('PART');
+
+                    expect(ret).toBe(false);
+                    expect(IRCStream.prototype.leaveChannel).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('with no parameters and with a channel selected', function () {
+                it('should leave the currently selected channel', function () {
+                    spyOn(IRCStream.prototype, 'leaveChannel');
+                    component = TestUtils.renderIntoDocument(<Application />);
+
+                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+
+                    var ret = component.processCommand('PART');
+
+                    expect(ret).toBe(true);
+                    expect(IRCStream.prototype.leaveChannel).toHaveBeenCalledWith('#test');
+                });
+            });
+
+            describe('with a parameter not matching any joined channels', function () {
+                it('should return false', function () {
+                    spyOn(IRCStream.prototype, 'leaveChannel');
+                    component = TestUtils.renderIntoDocument(<Application />);
+
+                    var ret = component.processCommand('PART #test');
+
+                    expect(ret).toBe(false);
+                    expect(IRCStream.prototype.leaveChannel).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('with a parameter matching a joined channel', function () {
+                it('should leave the targetted channel', function () {
+                    spyOn(IRCStream.prototype, 'leaveChannel');
+                    component = TestUtils.renderIntoDocument(<Application />);
+
+                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+
+                    var ret = component.processCommand('PART #test');
+
+                    expect(ret).toBe(true);
+                    expect(IRCStream.prototype.leaveChannel).toHaveBeenCalledWith('#test');
+                });
+            });
+
+            describe('with a parameter matching a joined channel with the wrong case', function () {
+                it('should leave the targetted channel', function () {
+                    spyOn(IRCStream.prototype, 'leaveChannel');
+                    component = TestUtils.renderIntoDocument(<Application />);
+
+                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+
+                    var ret = component.processCommand('PART #TeSt');
+
+                    expect(ret).toBe(true);
+                    expect(IRCStream.prototype.leaveChannel).toHaveBeenCalledWith('#test');
+                });
+            });
         });
     });
 
@@ -134,10 +206,19 @@ describe('the Application component', function () {
                 expect(component.state.channels['#test']).not.toBe(undefined);
                 expect(component.state.channels['#test'].name).toBe('#test');
             });
+
+            it('should deselect other channels and select the newly joined channel', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+
+                expect(component.state.channels['#test'].selected).toBe(true);
+                expect(component.state.channels.status.selected).toBe(false);
+            });
         });
 
-        describe('when channel is joined by someone else', function() {
-            it('should add the user to the channel and add a join message', function() {
+        describe('when channel is joined by someone else', function () {
+            it('should add the user to the channel and add a join message', function () {
                 component = TestUtils.renderIntoDocument(<Application />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -278,10 +359,117 @@ describe('the Application component', function () {
                 component = TestUtils.renderIntoDocument(<Application />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.on353Numeric({ numeric: '353', args: [ 'WebIRC', '=', '#test', 'nick1 nick2 nick3' ] });
+                component.on353Numeric({ numeric: '353', args: ['WebIRC', '=', '#test', 'nick1 nick2 nick3'] });
 
                 expect(component.state.channels['#test'].users.length).toBe(3);
             });
         });
+    });
+
+    describe('onPart', function () {
+        describe('when called with no message', function () {
+            it('should not change any channel', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onPart();
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+            });
+        });
+
+        describe('when called with a channel we are on and us as source', function () {
+            it('should remove the channel from the list', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onPart({ source: 'WebIRC!user@host', channel: '#test', message: 'Testing' });
+
+                expect(component.state.channels['#test']).toBe(undefined);
+            });
+
+            it('should set the selected channel to the status window', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onPart({ source: 'WebIRC!user@host', channel: '#test', message: 'Testing' });
+
+                expect(component.state.channels.status.selected).toBe(true);
+            });
+        });
+
+        describe('when called with a channel we are on and not us as source', function () {
+            it('should remove the user from the channel list and adds a part message', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'test1!user@host', channel: '#test' });
+                component.onPart({ source: 'test1!user@host', channel: '#test', message: 'Testing' });
+
+                expect(component.state.channels['#test'].users.length).toBe(0);
+                expect(component.state.channels['#test'].messages.length).toBe(2);
+            });
+        });
+    });
+
+    describe('onQuit', function () {
+        describe('when called with no message', function () {
+            it('should not change any channels or state', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'test!user@host', channel: '#test' });
+
+                component.onQuit();
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+                expect(component.state.channels['#test'].users.length).toBe(1);
+            });
+        });
+
+        describe('when called for a user we know nothing about', function () {
+            it('should not change any channels or state', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onQuit({ source: 'unknown!user@host' });
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+                expect(component.state.channels['#test'].users.length).toBe(1);
+            });
+        });
+
+        describe('when called for a user on a channel we are on', function () {
+            it('should remove that user from the channel and display a message in that channel', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onQuit({ source: 'test!user@host', message: 'quit' });
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+                expect(component.state.channels['#test'].users.length).toBe(0);
+                expect(component.state.channels['#test'].messages.length).toBe(2);
+            });
+        });
+
+        describe('when called for a user on multiple channels we are on', function () {
+            it('should remove that user from all of the channels and display a message in those channels', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onJoin({ source: 'test!user@host', channel: '#test2' });
+                component.onQuit({ source: 'test!user@host', message: 'quit' });
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+                expect(component.state.channels['#test'].users.length).toBe(0);
+                expect(component.state.channels['#test'].messages.length).toBe(2);
+                expect(component.state.channels['#test2'].users.length).toBe(0);
+                expect(component.state.channels['#test2'].messages.length).toBe(2);                
+            });
+        });        
     });
 });
