@@ -262,7 +262,7 @@ describe('the Application component', function () {
     });
 
     describe('onCommand', function () {
-        describe('when the parameter does not start with a slash', function () {
+        describe('when the parameter does not start with a slash and status window is selected', function () {
             it('should not process any messages', function () {
                 component = TestUtils.renderIntoDocument(<Application />);
 
@@ -271,6 +271,23 @@ describe('the Application component', function () {
                 component.onCommand('NOSLASH');
 
                 expect(component.processCommand).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('when the parameter does not start with a slash and a window other than status is selected', function () {
+            it('should send a message to the currently selected target and add a message to the window', function () {
+                component = TestUtils.renderIntoDocument(<Application />);
+
+                spyOn(component, 'processCommand');
+                spyOn(IRCStream.prototype, 'sendMessage');
+                
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+
+                component.onCommand('Testing testing');
+
+                expect(component.processCommand).not.toHaveBeenCalled();
+                expect(component.state.channels['#test'].messages.length).toBe(1);
+                expect(IRCStream.prototype.sendMessage).toHaveBeenCalledWith('#test', 'Testing testing');
             });
         });
 

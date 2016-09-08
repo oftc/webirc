@@ -140,11 +140,11 @@ class Application extends React.Component {
         var source = quitMessage.source.substr(0, quitMessage.source.indexOf('!'));
 
         _.each(this.state.channels, channel => {
-            var matchingUser = _.find(channel.users, function(user) {
+            var matchingUser = _.find(channel.users, function (user) {
                 return user === source;
             });
 
-            if(!matchingUser) {
+            if (!matchingUser) {
                 return;
             }
 
@@ -281,6 +281,14 @@ class Application extends React.Component {
     onCommand(command) {
         if (command[0] === '/') {
             this.processCommand(command.slice(1));
+        } else if (!this.state.channels.status.selected) {
+            var split = command.split(' ');
+            var channel = _.find(this.state.channels, function (c) {
+                return c.selected;
+            }).name;
+
+            this.stream.sendMessage(channel, command);
+            this.addMessageToChannel(channel, '-> ', [command]);
         }
     }
 
