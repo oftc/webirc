@@ -37,7 +37,7 @@ class ChannelList extends React.Component {
         }
 
         return (
-            <div className='channel-list col-md-2 sidebar'>
+            <div className='channel-list col-xs-2 sidebar'>
                 <ul className='nav nav-sidebar'>
                     { channels }
                 </ul>

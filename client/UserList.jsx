@@ -14,7 +14,7 @@ class UserList extends React.Component {
         });
 
         return (
-            <div className='user-list col-md-1'>
+            <div className='user-list col-xs-1'>
                 <ul className='nav text-right'>
                     { users }
                 </ul>
