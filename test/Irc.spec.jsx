@@ -258,7 +258,45 @@ describe('the Irc component', function () {
                 expect(component.state.channels['test'].selected).not.toBe(true);
                 expect(component.state.channels['test2'].selected).toBe(true);
             });
+
+            it('should clear the unread message count for the channel', function () {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
+                component.onJoin({ source: 'WebIRC!user@host', channel: 'test2' });
+
+                component.addMessageToChannel('test', '', ['testing']);
+
+                component.onChannelSelected('test');
+                component.onChannelSelected('test2');
+
+                expect(component.state.channels.test.unreadCount).toBe(0);
+            });
         });
+    });
+
+    describe('addMessageToChannel', function () {
+        describe('when called for not selected channel', function () {
+            it('should increase the unread message count', function () {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
+
+                component.addMessageToChannel('status', '', ['testing']);
+
+                expect(component.state.channels.status.unreadCount).toBe(1);
+            });
+        });
+
+        describe('when called for a selected channel', function () {
+            it('should not increase the unread message count', function () {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.addMessageToChannel('status', '', ['testing']);
+
+                expect(component.state.channels.status.unreadCount).toBe(0);
+            });
+        })
     });
 
     describe('onCommand', function () {
@@ -280,7 +318,7 @@ describe('the Irc component', function () {
 
                 spyOn(component, 'processCommand');
                 spyOn(IRCStream.prototype, 'sendMessage');
-                
+
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
 
                 component.onCommand('Testing testing');
@@ -485,8 +523,8 @@ describe('the Irc component', function () {
                 expect(component.state.channels['#test'].users.length).toBe(0);
                 expect(component.state.channels['#test'].messages.length).toBe(2);
                 expect(component.state.channels['#test2'].users.length).toBe(0);
-                expect(component.state.channels['#test2'].messages.length).toBe(2);                
+                expect(component.state.channels['#test2'].messages.length).toBe(2);
             });
-        });        
+        });
     });
 });

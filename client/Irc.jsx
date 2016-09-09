@@ -27,7 +27,8 @@ class Irc extends React.Component {
                     name: 'Status',
                     messages: [],
                     users: [],
-                    selected: true
+                    selected: true,
+                    unreadCount: 0
                 }
             }
         };
@@ -92,7 +93,7 @@ class Irc extends React.Component {
         var source = joinMessage.source.substr(0, joinMessage.source.indexOf('!'));
 
         if (source === this.state.nickname) {
-            channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [] };
+            channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [], unreadCount: 0 };
             _.each(channels, function (channel) {
                 channel.selected = false;
             });
@@ -186,6 +187,10 @@ class Irc extends React.Component {
         var date = moment().format('HH:mm:ss SSS');
 
         channel.messages.push({ timestamp: date, command: command, args: args || [] });
+        if(!channel.selected) {
+            channel.unreadCount++;
+        }
+
         this.setState({ channels: channels });
     }
 
@@ -278,6 +283,7 @@ class Irc extends React.Component {
         });
 
         channels[channel].selected = true;
+        channels[channel].unreadCount = 0;
 
         this.setState({ channels: channels });
     }

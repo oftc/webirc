@@ -9,23 +9,29 @@ class ChannelList extends React.Component {
     }
 
     onSelected(channel) {
-        if(channel.selected) {
+        if (channel.selected) {
             return;
         }
 
-        if(this.props.onSelected) {
+        if (this.props.onSelected) {
             this.props.onSelected(channel.key);
-        }    
+        }
     }
 
     render() {
         var channels = [];
 
-        if(!_.isEmpty(this.props.channels)) {
+        if (!_.isEmpty(this.props.channels)) {
             _.each(this.props.channels, (channel, key) => {
+                var badge = null;
+
+                if (channel.unreadCount && channel.unreadCount !== 0) {
+                    badge = <span className='badge'>{ channel.unreadCount }</span>;
+                }
+
                 channels.push(
                     <li key={ key } className={ channel.selected ? 'active' : '' }>
-                        <a href='#' onClick={ () => this.onSelected(channel) }>{ channel.name }</a>
+                        <a href='#' onClick={ () => this.onSelected(channel) }>{ channel.name }{ badge }</a>
                     </li>);
             });
         }
