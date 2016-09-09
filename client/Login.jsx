@@ -15,16 +15,24 @@ class Login extends React.Component {
     onChange(event) {
         this.setState({ nickname: event.target.value });
         event.preventDefault();
+
+        return false;
     }
 
     onClick(event) {
         this.props.onStateChanged('irc', this.state.nickname);
     }
 
+    onSubmit(event) {
+        event.preventDefault();
+        
+        return false;
+    }
+
     render() {
         return (
             <div className='login'>
-                <form className='form-horizontal'>
+                <form className='form-horizontal' onSubmit={ this.onSubmit }>
                     <div className='form-group'>
                         <label htmlFor='nickname' className='col-sm-1 control-label'>Nickname</label>
                         <div className='col-sm-2'>
