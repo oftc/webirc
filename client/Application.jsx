@@ -1,4 +1,4 @@
-import React from 'React';
+import React from 'react';
 import IRCStream from 'ircng';
 import {render} from 'react-dom';
 import MainWindow from './MainWindow.jsx';
