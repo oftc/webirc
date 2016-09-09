@@ -201,7 +201,7 @@ class Application extends React.Component {
             target = source;
         }
 
-        this.addMessageToChannel(target, '', [message.source + ' [' + message.message + ']']);
+        this.addMessageToChannel(target, '', ['[' + message.source + '] ' + message.message]);
     }
 
     on353Numeric(message) {
