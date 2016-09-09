@@ -15,10 +15,11 @@ html
           span.icon-bar
           span.icon-bar
           span.icon-bar
-        a.navbar-brand(href="/") Web IRC
+        a.navbar-brand(href="#") Web IRC
         #navbar.collapse.navbar-collapse
           ul.nav.navbar-nav
-            each menuItem in [{ name: "Home", path: '/' }]
+            // { name: "Home", path: '#' }
+            each menuItem in []
               if(menu == menuItem.name)
                 li.active
                   a(href=menuItem.path)= menuItem.name

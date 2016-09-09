@@ -5,6 +5,7 @@ import TestUtils from 'react-addons-test-utils';
 
 describe('The TextWindow component', function() {
     var node, component;
+    
     beforeEach(function() {
         node = document.createElement('div');
         component = ReactDOM.render(<TextWindow messages={[]} />, node);
