@@ -1,3 +1,4 @@
+require('es6-promise').polyfill();
 var webpack = require('webpack');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
