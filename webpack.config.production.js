@@ -8,7 +8,7 @@ var APP_DIR = path.resolve(__dirname, 'client');
 var LESS_DIR = path.resolve(__dirname, 'less');
 
 var config = {
-    devtool: 'eval-source-map',
+    devtool: 'cheap-module-eval-source-map',
     entry: [
         path.join(__dirname, 'client/Application.jsx'),
         LESS_DIR + '/site.less'
@@ -30,6 +30,7 @@ var config = {
                 screw_ie8: true
             }
         }),
+        new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
