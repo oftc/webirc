@@ -13,7 +13,6 @@ class Application extends React.Component {
     }
 
     onStateChanged(newState, stateArg) {
-        console.info('state changes', newState, stateArg);
         this.setState({ appState: newState, stateArg: stateArg });
     }
 

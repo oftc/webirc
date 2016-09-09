@@ -14,6 +14,7 @@ class Login extends React.Component {
 
     onChange(event) {
         this.setState({ nickname: event.target.value });
+        event.preventDefault();
     }
 
     onClick(event) {
