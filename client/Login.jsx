@@ -14,18 +14,18 @@ class Login extends React.Component {
 
     onChange(event) {
         this.setState({ nickname: event.target.value });
+    }
+
+    onClick(event) {
+        this.props.onStateChanged('irc', this.state.nickname);
         event.preventDefault();
 
         return false;
     }
 
-    onClick(event) {
-        this.props.onStateChanged('irc', this.state.nickname);
-    }
-
     onSubmit(event) {
         event.preventDefault();
-        
+
         return false;
     }
 
