@@ -239,6 +239,7 @@ class Irc extends React.Component {
 
         switch (command.toUpperCase()) {
             case 'JOIN':
+            case 'J':
                 if (split.length < 2) {
                     return false;
                 }
@@ -246,6 +247,7 @@ class Irc extends React.Component {
                 this.stream.joinChannel(split[1]);
                 break;
             case 'PART':
+            case 'LEAVE':
                 var channel = '';
 
                 if (split.length < 2) {
@@ -267,6 +269,19 @@ class Irc extends React.Component {
                 }
 
                 this.stream.leaveChannel(channel);
+                break;
+            case 'MSG':
+            case 'W':
+            case 'M':
+                if(split.length < 3) {
+                    return false;
+                }
+
+                var message = split.slice(2).join(' ');
+
+                this.stream.sendMessage(split[1], message);
+                this.addMessageToChannel(split[1], '-> ', [message]);
+
                 break;
             default:
                 return false;

@@ -125,6 +125,47 @@ describe('the Irc component', function () {
             })
         });
 
+        describe('that is MSG', function () {
+            describe('with no parameters', function () {
+                it('should return false', function () {
+                    spyOn(IRCStream.prototype, 'sendMessage');
+                    component = TestUtils.renderIntoDocument(<Irc />);
+
+                    var ret = component.processCommand('MSG');
+
+                    expect(ret).toBe(false);
+                    expect(IRCStream.prototype.sendMessage).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('with a target but no parameter', function () {
+                it('should return false', function () {
+                    spyOn(IRCStream.prototype, 'sendMessage');
+                    component = TestUtils.renderIntoDocument(<Irc />);
+
+                    var ret = component.processCommand('MSG test');
+
+                    expect(ret).toBe(false);
+                    expect(IRCStream.prototype.sendMessage).not.toHaveBeenCalled();
+                });
+            });
+
+            describe('with a target and parameter', function () {
+                it('should send the message, create a new channel for it and add the message to it', function () {
+                    spyOn(IRCStream.prototype, 'sendMessage');
+                    component = TestUtils.renderIntoDocument(<Irc />);
+
+                    var ret = component.processCommand('MSG test testing testing');
+
+                    expect(ret).toBe(true);
+                    expect(IRCStream.prototype.sendMessage).toHaveBeenCalledWith('test', 'testing testing');
+                    expect(component.state.channels['test']).not.toBe(undefined);
+                    expect(component.state.channels['test'].messages.length).toBe(1);
+                });
+            });
+
+        });
+
         describe('that is PART', function () {
             describe('with no paramters and in the status window', function () {
                 it('should return false', function () {
