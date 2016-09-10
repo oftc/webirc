@@ -10,7 +10,6 @@ class Irc extends React.Component {
     constructor() {
         super();
 
-        this.onMessage = this.onMessage.bind(this);
         this.onJoin = this.onJoin.bind(this);
         this.onChannelSelected = this.onChannelSelected.bind(this);
         this.onCommand = this.onCommand.bind(this);
@@ -19,6 +18,7 @@ class Irc extends React.Component {
         this.on353Numeric = this.on353Numeric.bind(this);
         this.onPart = this.onPart.bind(this);
         this.onQuit = this.onQuit.bind(this);
+        this.onNumeric = this.onNumeric.bind(this);
 
         this.state = {
             channels: {
@@ -48,7 +48,6 @@ class Irc extends React.Component {
 
         this.stream.setNickname(this.state.nickname);
 
-        this.stream.on('message', this.onMessage);
         this.stream.on('send', function (message) {
             socket.emit('message', message.message);
         });
@@ -57,6 +56,7 @@ class Irc extends React.Component {
         this.stream.on('part', this.onPart);
         this.stream.on('quit', this.onQuit);
         this.stream.on('privmsg', this.onPrivmsg);
+        this.stream.on('numeric', this.onNumeric);
 
         this.stream.on('353', this.on353Numeric);
 
@@ -159,20 +159,12 @@ class Irc extends React.Component {
         });
     }
 
-    onMessage(message) {
-        if (!message || !message.command) {
+    onNumeric(numeric) {
+        if (!numeric || !numeric.number) {
             return;
         }
 
-        var target = '';
-
-        if (!message.target) {
-            target = 'status';
-        } else {
-            target = message.target;
-        }
-
-        this.addMessageToChannel(target, message.command, message.args);
+        this.addMessageToChannel('status', numeric.number, numeric.args);
     }
 
     addMessageToChannel(channelKey, command, args) {
@@ -187,7 +179,7 @@ class Irc extends React.Component {
         var date = moment().format('HH:mm:ss SSS');
 
         channel.messages.push({ timestamp: date, command: command, args: args || [] });
-        if(!channel.selected) {
+        if (!channel.selected) {
             channel.unreadCount++;
         }
 
@@ -273,7 +265,7 @@ class Irc extends React.Component {
             case 'MSG':
             case 'W':
             case 'M':
-                if(split.length < 3) {
+                if (split.length < 3) {
                     return false;
                 }
 

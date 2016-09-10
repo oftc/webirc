@@ -30,50 +30,37 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onMessage', function () {
-        describe('when no message passed in', function () {
+    describe('onNumeric', function () {
+        describe('when no numeric passed in', function () {
             it('should add no messages to the state', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onMessage();
+                component.onNumeric();
 
                 expect(component.state.channels.status.messages.length).toBe(0);
             });
         });
 
-        describe('when message passed in but no command in it', function () {
+        describe('when numeric passed in but no number in it', function () {
             it('should add no messages to the state', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onMessage({});
+                component.onNumeric({});
 
                 expect(component.state.channels.status.messages.length).toBe(0);
             });
         });
 
-        describe('when message is passed in with no target', function () {
-            it('should add the message to the status message list', function () {
+        describe('when numeric is passed in', function () {
+            it('should add a message to the message list', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onMessage({ command: 'TEST' });
+                component.onNumeric({ number: '001', args: ['testing 123']});
 
                 expect(component.state.channels.status.messages.length).toBe(1);
-                expect(component.state.channels.status.messages[0].command).toBe('TEST');
-                expect(component.state.channels.status.messages[0].args.length).toBe(0);
+                expect(component.state.channels.status.messages[0].command).toBe('001');
+                expect(component.state.channels.status.messages[0].args.length).toBe(1);
                 expect(component.state.channels.status.messages[0].timestamp).not.toBe('');
-            });
-        });
-
-        describe('when message is passed in with target', function () {
-            it('should add the message to the message list for the target', function () {
-                component = TestUtils.renderIntoDocument(<Irc />);
-
-                component.onMessage({ command: 'TEST', target: '#test' });
-
-                expect(component.state.channels['#test'].messages.length).toBe(1);
-                expect(component.state.channels['#test'].messages[0].command).toBe('TEST');
-                expect(component.state.channels['#test'].messages[0].args.length).toBe(0);
-                expect(component.state.channels['#test'].messages[0].timestamp).not.toBe('');
             });
         });
     });
