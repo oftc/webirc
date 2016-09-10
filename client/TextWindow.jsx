@@ -31,7 +31,7 @@ class TextWindow extends React.Component {
         });
 
         return(
-            <div id='text-window' className='text-window col-xs-9 col-xs-offset-2'>
+            <div id='text-window' className='text-window col-xs-10 col-xs-offset-1'>
                 { messages }
             </div>);
     }

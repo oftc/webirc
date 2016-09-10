@@ -36,33 +36,4 @@ describe('the <MainWindow /> component', function () {
             expect(textWindows[0].props.messages).toBe(messages);
         });
     });
-
-    describe('onChannelSelected', function () {
-        describe('when no callback', function () {
-            it('should not call a callback', function () {
-                component = TestUtils.renderIntoDocument(<MainWindow channels={ {} } />);
-                var channel = {};
-
-                component.onChannelSelected(channel);
-            });
-        });
-
-        describe('when callback specified', function () {
-            it('should call the callback', function () {
-                var spy = {
-                    onChannelSelected: function () {
-                    }
-                };
-
-                spyOn(spy, 'onChannelSelected');
-
-                component = TestUtils.renderIntoDocument(<MainWindow channels={ {} } onChannelSelected={ spy.onChannelSelected } />);
-                var channel = {};
-
-                component.onChannelSelected(channel);
-
-                expect(spy.onChannelSelected).toHaveBeenCalled();
-            });
-        })
-    });
 });

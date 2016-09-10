@@ -8,19 +8,11 @@ class MainWindow extends React.Component {
     constructor() {
         super();
 
-        this.onChannelSelected = this.onChannelSelected.bind(this);
-
         this.state = { channels: [] };
     }
 
     componentWillMount() {
         this.setState({ channels: this.props.channels });
-    }
-
-    onChannelSelected(channel) {
-        if(this.props.onChannelSelected) {
-            this.props.onChannelSelected(channel);
-        }
     }
 
     render() {
@@ -38,7 +30,7 @@ class MainWindow extends React.Component {
         
         return (
             <div>
-                <ChannelList channels={ this.props.channels } onSelected={ this.onChannelSelected } />
+                <ChannelList channels={ this.props.channels } onSelected={ this.props.onChannelSelected } onCloseChannel={ this.props.onCloseChannel } />
                 <TextWindow messages={ messages } />
                 <UserList users={ users } />
                 <footer className='footer'>
@@ -52,6 +44,7 @@ MainWindow.displayName = 'MainWindow';
 MainWindow.propTypes = {
     channels: React.PropTypes.object.isRequired,
     onChannelSelected: React.PropTypes.func,
+    onCloseChannel: React.PropTypes.func,
     onCommand: React.PropTypes.func
 };
 

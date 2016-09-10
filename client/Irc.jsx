@@ -19,6 +19,7 @@ class Irc extends React.Component {
         this.onPart = this.onPart.bind(this);
         this.onQuit = this.onQuit.bind(this);
         this.onNumeric = this.onNumeric.bind(this);
+        this.onCloseChannel = this.onCloseChannel.bind(this);
 
         this.state = {
             channels: {
@@ -295,6 +296,28 @@ class Irc extends React.Component {
         this.setState({ channels: channels });
     }
 
+    onCloseChannel(channel) {
+        if (!channel) {
+            return;
+        }
+
+        var channels = this.state.channels;
+
+        delete channels[channel];
+
+        _.each(channels, function (c) {
+            c.selected = false;
+        });
+
+        channels.status.selected = true;
+
+        if (channel[0] === '#') {
+            this.stream.leaveChannel(channel);
+        }
+
+        this.setState({ channels: channels });
+    }
+
     onCommand(command) {
         if (command[0] === '/') {
             this.processCommand(command.slice(1));
@@ -310,7 +333,10 @@ class Irc extends React.Component {
     }
 
     render() {
-        return (<MainWindow channels={ this.state.channels } onCommand={ this.onCommand } onChannelSelected={ this.onChannelSelected } />);
+        return (<MainWindow channels={ this.state.channels }
+            onCommand={ this.onCommand }
+            onChannelSelected={ this.onChannelSelected }
+            onCloseChannel={ this.onCloseChannel } />);
     }
 }
 

@@ -55,7 +55,7 @@ describe('the Irc component', function () {
             it('should add a message to the message list', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onNumeric({ number: '001', args: ['testing 123']});
+                component.onNumeric({ number: '001', args: ['testing 123'] });
 
                 expect(component.state.channels.status.messages.length).toBe(1);
                 expect(component.state.channels.status.messages[0].command).toBe('001');
@@ -554,5 +554,44 @@ describe('the Irc component', function () {
                 expect(component.state.channels['#test2'].messages.length).toBe(2);
             });
         });
+    });
+
+    describe('onCloseChannel', function () {
+        describe('when called with no channel', function () {
+            it('should not change the channel state', function () {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onCloseChannel();
+
+                expect(component.state.channels['#test']).not.toBe(undefined);
+            });
+        });
+
+        describe('when called with a channel', function () {
+            it('should leave the channel and close the window', function () {
+                spyOn(IRCStream.prototype, 'leaveChannel');
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onCloseChannel('#test');
+
+                expect(component.state.channels['#test']).toBe(undefined);
+                expect(IRCStream.prototype.leaveChannel).toHaveBeenCalledWith('#test');
+            });
+        });
+
+        describe('when called with a nickname', function() {
+            it('should close the window but not call leave channel', function() {
+                spyOn(IRCStream.prototype, 'leaveChannel');
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onPrivmsg({ source: 'tester!user@host', target: 'WebIRC', message: 'testy testy' });
+                component.onCloseChannel('tester');
+
+                expect(component.state.channels['tester']).toBe(undefined);
+                expect(IRCStream.prototype.leaveChannel).not.toHaveBeenCalled();
+            });
+        })
     });
 });

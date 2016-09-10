@@ -98,9 +98,25 @@ describe('the <ChannelList /> component', function () {
 
             component = ReactDOM.render(<ChannelList channels={ channels } />, node);
             var badges = TestUtils.scryRenderedDOMComponentsWithClass(component, 'badge');
-            
+
             expect(badges.length).toBe(1);
             expect(badges[0].innerText).toBe('2');
+        });
+    });
+
+    describe('when a remove icon is clicked', function () {
+        it('should raise a close channel event with the correct channel', function () {
+            var closeSpy = { onCloseChannel: function () { } };
+
+            spyOn(closeSpy, 'onCloseChannel');
+
+            component = ReactDOM.render(<ChannelList channels={ channels } onCloseChannel={ closeSpy.onCloseChannel } />, node);
+
+            var closeButtons = TestUtils.scryRenderedDOMComponentsWithClass(component, 'close-channel');
+
+            TestUtils.Simulate.click(closeButtons[0]);
+
+            expect(closeSpy.onCloseChannel).toHaveBeenCalledWith('test1');
         });
     });
 });
