@@ -18,6 +18,7 @@ class MainWindow extends React.Component {
     render() {
         var messages = [];
         var users = [];
+        var currentChannel;
 
         for(var channelKey in this.props.channels) {
             var channel = this.props.channels[channelKey];
@@ -25,13 +26,16 @@ class MainWindow extends React.Component {
             if(channel.selected) {
                 messages = channel.messages || [];
                 users = channel.users || [];
+                currentChannel = channel;
             }            
         }
         
         return (
             <div>
-                <ChannelList channels={ this.props.channels } onSelected={ this.props.onChannelSelected } onCloseChannel={ this.props.onCloseChannel } />
-                <TextWindow messages={ messages } />
+                <ChannelList channels={ this.props.channels }
+                    onSelected={ this.props.onChannelSelected }
+                    onCloseChannel={ this.props.onCloseChannel } />
+                <TextWindow channel={ currentChannel } messages={ messages } />
                 <UserList users={ users } />
                 <footer className='footer'>
                     <CommandBar onCommand={ this.props.onCommand }/>

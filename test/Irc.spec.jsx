@@ -58,7 +58,6 @@ describe('the Irc component', function () {
                 component.onNumeric({ number: '001', args: ['testing 123'] });
 
                 expect(component.state.channels.status.messages.length).toBe(1);
-                expect(component.state.channels.status.messages[0].command).toBe('001');
                 expect(component.state.channels.status.messages[0].args.length).toBe(1);
                 expect(component.state.channels.status.messages[0].timestamp).not.toBe('');
             });
@@ -442,9 +441,37 @@ describe('the Irc component', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.on353Numeric({ numeric: '353', args: ['WebIRC', '=', '#test', 'nick1 nick2 nick3'] });
+                component.on353Numeric(['=', '#test', 'nick1 nick2 nick3']);
 
                 expect(component.state.channels['#test'].users.length).toBe(3);
+            });
+        });
+    });
+    
+    describe('on332Numeric', function() {
+        describe('when called with no message', function() {
+            it('should set no topics', function() {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.on332Numeric();
+
+                var topicsSet = _.any(component.state.channels, function(channel) {
+                    return channel.topic;
+                });
+                
+                expect(topicsSet).toBe(false);
+            });
+        });
+
+        describe('when called with a channel', function() {
+            it('should set the topic for that channel', function() {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.on332Numeric([ '#test', 'test topic' ]);
+                
+                expect(component.state.channels['#test'].topic).toBe('test topic');
             });
         });
     });

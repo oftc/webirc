@@ -30,8 +30,11 @@ class TextWindow extends React.Component {
             itemIndex++;
         });
 
+        var topic = this.props.channel ? <div className='topic text-center'>{ this.props.channel.topic }</div> : null;
+
         return(
             <div id='text-window' className='text-window col-xs-10 col-xs-offset-1'>
+                { topic }
                 { messages }
             </div>);
     }
@@ -39,6 +42,7 @@ class TextWindow extends React.Component {
 
 TextWindow.displayName = 'TextWindow';
 TextWindow.propTypes = {
+    channel: React.PropTypes.object,
     messages: React.PropTypes.array.isRequired
 };
 

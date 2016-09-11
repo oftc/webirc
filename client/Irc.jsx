@@ -38,7 +38,7 @@ class Irc extends React.Component {
     }
 
     componentWillMount() {
-        if (!this.state.nickname) {
+        if(!this.state.nickname) {
             this.setState({ nickname: this.props.nickname || 'WebIRC' });
         }
     }
@@ -49,7 +49,7 @@ class Irc extends React.Component {
 
         this.stream.setNickname(this.state.nickname);
 
-        this.stream.on('send', function (message) {
+        this.stream.on('send', function(message) {
             socket.emit('message', message.message);
         });
 
@@ -59,7 +59,7 @@ class Irc extends React.Component {
         this.stream.on('privmsg', this.onPrivmsg);
         this.stream.on('numeric', this.onNumeric);
 
-        this.stream.on('353', this.on353Numeric);
+        //   this.stream.on('353', this.on353Numeric);
 
         this.stream.on('433', message => {
             this.setState({ nickname: this.state.nickname + nickAttempts });
@@ -67,7 +67,7 @@ class Irc extends React.Component {
             nickAttempts++;
         });
 
-        socket.on('error', function (error) {
+        socket.on('error', function(error) {
             console.log('socket Error: ' + error);
         });
 
@@ -79,11 +79,11 @@ class Irc extends React.Component {
             this.stream.register({ nick: this.state.nickname, username: 'WebIRC', realname: 'WebIRC User' });
         });
 
-        socket.on('disconnect', function () {
+        socket.on('disconnect', function() {
             console.info('disconnected');
         });
 
-        window.onbeforeunload = function (e) {
+        window.onbeforeunload = function(e) {
             socket.disconnect();
         }
     }
@@ -93,9 +93,9 @@ class Irc extends React.Component {
         var channelKey = joinMessage.channel.toLowerCase();
         var source = joinMessage.source.substr(0, joinMessage.source.indexOf('!'));
 
-        if (source === this.state.nickname) {
+        if(source === this.state.nickname) {
             channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [], unreadCount: 0 };
-            _.each(channels, function (channel) {
+            _.each(channels, function(channel) {
                 channel.selected = false;
             });
 
@@ -109,7 +109,7 @@ class Irc extends React.Component {
     }
 
     onPart(partMessage) {
-        if (!partMessage) {
+        if(!partMessage) {
             return;
         }
 
@@ -118,17 +118,17 @@ class Irc extends React.Component {
 
         var source = partMessage.source.substr(0, partMessage.source.indexOf('!'));
 
-        if (source === this.state.nickname) {
+        if(source === this.state.nickname) {
             delete channels[channelKey];
 
-            _.each(channels, function (channel) {
+            _.each(channels, function(channel) {
                 channel.selected = false;
             });
 
             channels.status.selected = true;
         } else {
             var channel = channels[channelKey];
-            channel.users = _.reject(channel.users, function (user) {
+            channel.users = _.reject(channel.users, function(user) {
                 return user === source;
             });
 
@@ -139,18 +139,18 @@ class Irc extends React.Component {
     }
 
     onQuit(quitMessage) {
-        if (!quitMessage) {
+        if(!quitMessage) {
             return;
         }
 
         var source = quitMessage.source.substr(0, quitMessage.source.indexOf('!'));
 
         _.each(this.state.channels, channel => {
-            var matchingUser = _.find(channel.users, function (user) {
+            var matchingUser = _.find(channel.users, function(user) {
                 return user === source;
             });
 
-            if (!matchingUser) {
+            if(!matchingUser) {
                 return;
             }
 
@@ -161,18 +161,28 @@ class Irc extends React.Component {
     }
 
     onNumeric(numeric) {
-        if (!numeric || !numeric.number) {
+        if(!numeric || !numeric.number) {
             return;
         }
 
-        this.addMessageToChannel('status', numeric.number, numeric.args);
+        switch(numeric.number) {
+            case '332':
+                this.on332Numeric(numeric.args);
+                break;
+            case '353':
+                this.on353Numeric(numeric.args);
+                break;
+            default:
+                this.addMessageToChannel('status', '', numeric.args);
+                break;
+        }
     }
 
     addMessageToChannel(channelKey, command, args) {
         var channels = this.state.channels;
         var channel = channels[channelKey];
 
-        if (!channel) {
+        if(!channel) {
             channel = { key: channelKey, name: channelKey, messages: [] };
             channels[channelKey] = channel;
         }
@@ -180,7 +190,7 @@ class Irc extends React.Component {
         var date = moment().format('HH:mm:ss SSS');
 
         channel.messages.push({ timestamp: date, command: command, args: args || [] });
-        if (!channel.selected) {
+        if(!channel.selected) {
             channel.unreadCount++;
         }
 
@@ -188,16 +198,16 @@ class Irc extends React.Component {
     }
 
     onPrivmsg(message) {
-        if (!message) {
+        if(!message) {
             return;
         }
 
         var source = message.source.substr(0, message.source.indexOf('!'));
         var target = '';
 
-        if (message.target[0] === '#') {
+        if(message.target[0] === '#') {
             target = message.target;
-        } else if (message.target !== this.state.nickname) {
+        } else if(message.target !== this.state.nickname) {
             target = 'status';
         } else {
             target = source;
@@ -206,34 +216,49 @@ class Irc extends React.Component {
         this.addMessageToChannel(target, '', ['[' + message.source + '] ' + message.message]);
     }
 
-    on353Numeric(message) {
-        if (!message) {
+    on332Numeric(args) {
+        if(!args) {
             return;
         }
 
-        var channelKey = message.args[2];
+        var channelKey = args[0];
         var channels = this.state.channels;
 
         var channel = channels[channelKey];
 
-        var users = message.args[3].split(' ');
+        channel.topic = args[1];
+
+        this.setState({ channels: channels });        
+    }
+
+    on353Numeric(args) {
+        if(!args) {
+            return;
+        }
+
+        var channelKey = args[1];
+        var channels = this.state.channels;
+
+        var channel = channels[channelKey];
+
+        var users = args[2].split(' ');
         channel.users = _.union(channel.users, users);
 
         this.setState({ channels: channels });
     }
 
     processCommand(commandLine) {
-        if (!commandLine) {
+        if(!commandLine) {
             return false;
         }
 
         var split = commandLine.split(' ');
         var command = split[0];
 
-        switch (command.toUpperCase()) {
+        switch(command.toUpperCase()) {
             case 'JOIN':
             case 'J':
-                if (split.length < 2) {
+                if(split.length < 2) {
                     return false;
                 }
 
@@ -243,16 +268,16 @@ class Irc extends React.Component {
             case 'LEAVE':
                 var channel = '';
 
-                if (split.length < 2) {
-                    if (this.state.channels.status.selected) {
+                if(split.length < 2) {
+                    if(this.state.channels.status.selected) {
                         return false;
                     }
 
-                    channel = _.find(this.state.channels, function (c) {
+                    channel = _.find(this.state.channels, function(c) {
                         return c.selected;
                     }).name;
                 } else {
-                    if (!_.any(this.state.channels, function (c) {
+                    if(!_.any(this.state.channels, function(c) {
                         return c.name.toLowerCase() === split[1].toLowerCase();
                     })) {
                         return false;
@@ -266,7 +291,7 @@ class Irc extends React.Component {
             case 'MSG':
             case 'W':
             case 'M':
-                if (split.length < 3) {
+                if(split.length < 3) {
                     return false;
                 }
 
@@ -286,7 +311,7 @@ class Irc extends React.Component {
     onChannelSelected(channel) {
         var channels = this.state.channels;
 
-        _.each(channels, function (c) {
+        _.each(channels, function(c) {
             c.selected = false;
         });
 
@@ -297,7 +322,7 @@ class Irc extends React.Component {
     }
 
     onCloseChannel(channel) {
-        if (!channel) {
+        if(!channel) {
             return;
         }
 
@@ -305,13 +330,13 @@ class Irc extends React.Component {
 
         delete channels[channel];
 
-        _.each(channels, function (c) {
+        _.each(channels, function(c) {
             c.selected = false;
         });
 
         channels.status.selected = true;
 
-        if (channel[0] === '#') {
+        if(channel[0] === '#') {
             this.stream.leaveChannel(channel);
         }
 
@@ -319,11 +344,11 @@ class Irc extends React.Component {
     }
 
     onCommand(command) {
-        if (command[0] === '/') {
+        if(command[0] === '/') {
             this.processCommand(command.slice(1));
-        } else if (!this.state.channels.status.selected) {
+        } else if(!this.state.channels.status.selected) {
             var split = command.split(' ');
-            var channel = _.find(this.state.channels, function (c) {
+            var channel = _.find(this.state.channels, function(c) {
                 return c.selected;
             }).name;
 
