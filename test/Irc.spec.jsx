@@ -1,27 +1,28 @@
+/*global describe, it, expect, beforeEach, spyOn */
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import Irc from './../client/Irc.jsx'
+import Irc from './../client/Irc.jsx';
 import MainWindow from './../client/MainWindow.jsx';
 import ChannelList from './../client/ChannelList.jsx';
 import stubComponent from './test-setup.js';
 import IRCStream from 'ircng';
-import io from 'socket.io-client'
+import io from 'socket.io-client';
 import _ from 'underscore';
 
-describe('the Irc component', function () {
+describe('the Irc component', function() {
     var component;
-    var socketMock = { on: function () { } };
+    var socketMock = { on: function() { } };
 
     stubComponent(MainWindow);
     stubComponent(ChannelList);
 
-    beforeEach(function () {
+    beforeEach(function() {
         spyOn(io, 'connect').and.returnValue(socketMock);
         spyOn(IRCStream.prototype, 'on');
     });
 
-    describe('on first render', function () {
-        it('should render a main window with the status channel defined', function () {
+    describe('on first render', function() {
+        it('should render a main window with the status channel defined', function() {
             component = TestUtils.renderIntoDocument(<Irc />);
 
             expect(component.state.channels.status).not.toBe(undefined);
@@ -30,9 +31,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onNumeric', function () {
-        describe('when no numeric passed in', function () {
-            it('should add no messages to the state', function () {
+    describe('onNumeric', function() {
+        describe('when no numeric passed in', function() {
+            it('should add no messages to the state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onNumeric();
@@ -41,8 +42,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when numeric passed in but no number in it', function () {
-            it('should add no messages to the state', function () {
+        describe('when numeric passed in but no number in it', function() {
+            it('should add no messages to the state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onNumeric({});
@@ -51,8 +52,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when numeric is passed in', function () {
-            it('should add a message to the message list', function () {
+        describe('when numeric is passed in', function() {
+            it('should add a message to the message list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onNumeric({ number: '001', args: ['testing 123'] });
@@ -64,9 +65,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('processCommand', function () {
-        describe('when command is undefined', function () {
-            it('should process no commands and return false', function () {
+    describe('processCommand', function() {
+        describe('when command is undefined', function() {
+            it('should process no commands and return false', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 var ret = component.processCommand();
@@ -75,8 +76,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('that is unrecognised', function () {
-            it('should return false', function () {
+        describe('that is unrecognised', function() {
+            it('should return false', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 var ret = component.processCommand('NOTACOMMAND');
@@ -85,9 +86,9 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('that is JOIN', function () {
-            describe('with no parameters', function () {
-                it('should return false', function () {
+        describe('that is JOIN', function() {
+            describe('with no parameters', function() {
+                it('should return false', function() {
                     spyOn(IRCStream.prototype, 'joinChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -98,8 +99,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a parameter', function () {
-                it('should join the requested channel', function () {
+            describe('with a parameter', function() {
+                it('should join the requested channel', function() {
                     spyOn(IRCStream.prototype, 'joinChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -107,13 +108,13 @@ describe('the Irc component', function () {
 
                     expect(ret).toBe(true);
                     expect(IRCStream.prototype.joinChannel).toHaveBeenCalled();
-                })
-            })
+                });
+            });
         });
 
-        describe('that is MSG', function () {
-            describe('with no parameters', function () {
-                it('should return false', function () {
+        describe('that is MSG', function() {
+            describe('with no parameters', function() {
+                it('should return false', function() {
                     spyOn(IRCStream.prototype, 'sendMessage');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -124,8 +125,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a target but no parameter', function () {
-                it('should return false', function () {
+            describe('with a target but no parameter', function() {
+                it('should return false', function() {
                     spyOn(IRCStream.prototype, 'sendMessage');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -136,8 +137,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a target and parameter', function () {
-                it('should send the message, create a new channel for it and add the message to it', function () {
+            describe('with a target and parameter', function() {
+                it('should send the message, create a new channel for it and add the message to it', function() {
                     spyOn(IRCStream.prototype, 'sendMessage');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -152,9 +153,9 @@ describe('the Irc component', function () {
 
         });
 
-        describe('that is PART', function () {
-            describe('with no paramters and in the status window', function () {
-                it('should return false', function () {
+        describe('that is PART', function() {
+            describe('with no paramters and in the status window', function() {
+                it('should return false', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -165,8 +166,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with no parameters and with a channel selected', function () {
-                it('should leave the currently selected channel', function () {
+            describe('with no parameters and with a channel selected', function() {
+                it('should leave the currently selected channel', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -179,8 +180,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a parameter not matching any joined channels', function () {
-                it('should return false', function () {
+            describe('with a parameter not matching any joined channels', function() {
+                it('should return false', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -191,8 +192,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a parameter matching a joined channel', function () {
-                it('should leave the targetted channel', function () {
+            describe('with a parameter matching a joined channel', function() {
+                it('should leave the targetted channel', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -206,8 +207,8 @@ describe('the Irc component', function () {
                 });
             });
 
-            describe('with a parameter matching a joined channel with the wrong case', function () {
-                it('should leave the targetted channel', function () {
+            describe('with a parameter matching a joined channel with the wrong case', function() {
+                it('should leave the targetted channel', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -223,9 +224,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('joinMessage', function () {
-        describe('when new channel joined by me', function () {
-            it('should add the new channel to the state', function () {
+    describe('joinMessage', function() {
+        describe('when new channel joined by me', function() {
+            it('should add the new channel to the state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -234,7 +235,7 @@ describe('the Irc component', function () {
                 expect(component.state.channels['#test'].name).toBe('#test');
             });
 
-            it('should deselect other channels and select the newly joined channel', function () {
+            it('should deselect other channels and select the newly joined channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -244,8 +245,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when channel is joined by someone else', function () {
-            it('should add the user to the channel and add a join message', function () {
+        describe('when channel is joined by someone else', function() {
+            it('should add the user to the channel and add a join message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -257,9 +258,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onChannelSelected', function () {
-        describe('when channel not selected', function () {
-            it('should set the channel to be selected', function () {
+    describe('onChannelSelected', function() {
+        describe('when channel not selected', function() {
+            it('should set the channel to be selected', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
@@ -272,8 +273,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when new channel selected', function () {
-            it('should set the new channel selected and all others unselected', function () {
+        describe('when new channel selected', function() {
+            it('should set the new channel selected and all others unselected', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
@@ -286,7 +287,7 @@ describe('the Irc component', function () {
                 expect(component.state.channels['test2'].selected).toBe(true);
             });
 
-            it('should clear the unread message count for the channel', function () {
+            it('should clear the unread message count for the channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
@@ -302,9 +303,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('addMessageToChannel', function () {
-        describe('when called for not selected channel', function () {
-            it('should increase the unread message count', function () {
+    describe('addMessageToChannel', function() {
+        describe('when called for not selected channel', function() {
+            it('should increase the unread message count', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
@@ -315,20 +316,20 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called for a selected channel', function () {
-            it('should not increase the unread message count', function () {
+        describe('when called for a selected channel', function() {
+            it('should not increase the unread message count', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.addMessageToChannel('status', '', ['testing']);
 
                 expect(component.state.channels.status.unreadCount).toBe(0);
             });
-        })
+        });
     });
 
-    describe('onCommand', function () {
-        describe('when the parameter does not start with a slash and status window is selected', function () {
-            it('should not process any messages', function () {
+    describe('onCommand', function() {
+        describe('when the parameter does not start with a slash and status window is selected', function() {
+            it('should not process any messages', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 spyOn(component, 'processCommand');
@@ -339,8 +340,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when the parameter does not start with a slash and a window other than status is selected', function () {
-            it('should send a message to the currently selected target and add a message to the window', function () {
+        describe('when the parameter does not start with a slash and a window other than status is selected', function() {
+            it('should send a message to the currently selected target and add a message to the window', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 spyOn(component, 'processCommand');
@@ -356,8 +357,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when the parameter starts with a slash', function () {
-            it('should process the messages', function () {
+        describe('when the parameter starts with a slash', function() {
+            it('should process the messages', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 spyOn(component, 'processCommand');
@@ -369,9 +370,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onPrivmsg', function () {
-        describe('when no message passed in', function () {
-            it('should add no messages to the state', function () {
+    describe('onPrivmsg', function() {
+        describe('when no message passed in', function() {
+            it('should add no messages to the state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onPrivmsg();
@@ -380,8 +381,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when privmsg not to me or to a channel', function () {
-            it('should add the message to the status channel', function () {
+        describe('when privmsg not to me or to a channel', function() {
+            it('should add the message to the status channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onPrivmsg({ source: 'test!user@host', target: 'notyou', message: 'testing testing' });
@@ -390,8 +391,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when privmsg to a channel that we have joined', function () {
-            it('should add the message to the channel\'s messages', function () {
+        describe('when privmsg to a channel that we have joined', function() {
+            it('should add the message to the channel\'s messages', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -402,8 +403,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when privmsg to a channel we have not joined', function () {
-            it('should create the channel and add the message to it', function () {
+        describe('when privmsg to a channel we have not joined', function() {
+            it('should create the channel and add the message to it', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onPrivmsg({ source: 'test!user@host', target: '#test', message: 'testing testing' });
@@ -412,8 +413,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when privmsg to me and not channel from new source', function () {
-            it('should add new channel for that source with the message', function () {
+        describe('when privmsg to me and not channel from new source', function() {
+            it('should add new channel for that source with the message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onPrivmsg({ source: 'test!user@host', target: 'WebIRC', message: 'testing testing' });
@@ -423,21 +424,21 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('on353Numeric', function () {
-        describe('when called with no message', function () {
-            it('should not change any channel user list', function () {
+    describe('on353Numeric', function() {
+        describe('when called with no message', function() {
+            it('should not change any channel user list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.on353Numeric();
 
-                expect(_.every(component.state.channels, function (channel) {
+                expect(_.every(component.state.channels, function(channel) {
                     return channel.users.length === 0;
                 })).toBe(true);
             });
         });
 
-        describe('when called for a joined channel', function () {
-            it('should add the users to the channel user list', function () {
+        describe('when called for a joined channel', function() {
+            it('should add the users to the channel user list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -447,7 +448,7 @@ describe('the Irc component', function () {
             });
         });
     });
-    
+
     describe('on332Numeric', function() {
         describe('when called with no message', function() {
             it('should set no topics', function() {
@@ -459,7 +460,7 @@ describe('the Irc component', function () {
                 var topicsSet = _.any(component.state.channels, function(channel) {
                     return channel.topic;
                 });
-                
+
                 expect(topicsSet).toBe(false);
             });
         });
@@ -469,16 +470,16 @@ describe('the Irc component', function () {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.on332Numeric([ '#test', 'test topic' ]);
-                
+                component.on332Numeric(['#test', 'test topic']);
+
                 expect(component.state.channels['#test'].topic).toBe('test topic');
             });
         });
     });
 
-    describe('onPart', function () {
-        describe('when called with no message', function () {
-            it('should not change any channel', function () {
+    describe('onPart', function() {
+        describe('when called with no message', function() {
+            it('should not change any channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -488,8 +489,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called with a channel we are on and us as source', function () {
-            it('should remove the channel from the list', function () {
+        describe('when called with a channel we are on and us as source', function() {
+            it('should remove the channel from the list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -498,7 +499,7 @@ describe('the Irc component', function () {
                 expect(component.state.channels['#test']).toBe(undefined);
             });
 
-            it('should set the selected channel to the status window', function () {
+            it('should set the selected channel to the status window', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -508,8 +509,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called with a channel we are on and not us as source', function () {
-            it('should remove the user from the channel list and adds a part message', function () {
+        describe('when called with a channel we are on and not us as source', function() {
+            it('should remove the user from the channel list and adds a part message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -522,9 +523,9 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onQuit', function () {
-        describe('when called with no message', function () {
-            it('should not change any channels or state', function () {
+    describe('onQuit', function() {
+        describe('when called with no message', function() {
+            it('should not change any channels or state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -537,8 +538,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called for a user we know nothing about', function () {
-            it('should not change any channels or state', function () {
+        describe('when called for a user we know nothing about', function() {
+            it('should not change any channels or state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -550,8 +551,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called for a user on a channel we are on', function () {
-            it('should remove that user from the channel and display a message in that channel', function () {
+        describe('when called for a user on a channel we are on', function() {
+            it('should remove that user from the channel and display a message in that channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -564,8 +565,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called for a user on multiple channels we are on', function () {
-            it('should remove that user from all of the channels and display a message in those channels', function () {
+        describe('when called for a user on multiple channels we are on', function() {
+            it('should remove that user from all of the channels and display a message in those channels', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -583,9 +584,66 @@ describe('the Irc component', function () {
         });
     });
 
-    describe('onCloseChannel', function () {
-        describe('when called with no channel', function () {
-            it('should not change the channel state', function () {
+    describe('onNick', function() {
+        describe('when called with no message', function() {
+            it('should not update any nicknames', function() {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onNick();
+
+                expect(component.state.nickname).toBe('WebIRC');
+            });
+        });
+
+        describe('when called on our nickname', function() {
+            it('should update our nickname', function() {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onNick({ source: 'WebIRC!user@host', newnick: 'NewNick' });
+
+                expect(component.state.nickname).toBe('NewNick');
+                expect(component.state.channels.status.messages.length).toBe(1);
+            });
+        });
+
+        describe('when called with a nickname on channels we are on', function() {
+            it('should update the nickname in all channels', function() {
+                component = TestUtils.renderIntoDocument(<Irc />);
+
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+                component.onJoin({ source: 'test!user@host', channel: '#test2' });
+                component.onJoin({ source: 'WebIRC!user@host', channel: '#test3' });
+                component.onJoin({ source: 'test!user@host', channel: '#test3' });
+
+                component.onNick({ source: 'test!user@host', newnick: 'NewNick' });
+
+                expect(component.state.nickname).toBe('WebIRC');
+                expect(component.state.channels.status.messages.length).toBe(0);
+
+                var matchingOldNick = _.any(component.state.channels['#test'].users, function(user) {
+                    return user === 'test';
+                });
+                var matchingNewNick = _.any(component.state.channels['#test'].users, function(user) {
+                    return user === 'NewNick';
+                });
+
+                expect(matchingOldNick).toBe(false);
+                expect(matchingNewNick).toBe(true);
+
+                matchingNewNick = _.any(component.state.channels['#test2'].users, function(user) {
+                    return user === 'NewNick';
+                });
+
+                expect(matchingNewNick).toBe(true);
+            });
+        });
+    });
+
+    describe('onCloseChannel', function() {
+        describe('when called with no channel', function() {
+            it('should not change the channel state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
                 component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
@@ -595,8 +653,8 @@ describe('the Irc component', function () {
             });
         });
 
-        describe('when called with a channel', function () {
-            it('should leave the channel and close the window', function () {
+        describe('when called with a channel', function() {
+            it('should leave the channel and close the window', function() {
                 spyOn(IRCStream.prototype, 'leaveChannel');
                 component = TestUtils.renderIntoDocument(<Irc />);
 
@@ -619,6 +677,6 @@ describe('the Irc component', function () {
                 expect(component.state.channels['tester']).toBe(undefined);
                 expect(IRCStream.prototype.leaveChannel).not.toHaveBeenCalled();
             });
-        })
+        });
     });
 });
