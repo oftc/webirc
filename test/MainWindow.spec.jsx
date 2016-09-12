@@ -1,3 +1,4 @@
+/*global describe, it, expect */
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import MainWindow from './../client/MainWindow.jsx';

@@ -2,10 +2,6 @@ import React from 'react';
 import $ from 'jquery';
 
 class TextWindow extends React.Component {
-    constructor() {
-        super();
-    }
-
     componentDidUpdate() {
         this.updateScroll();
     }

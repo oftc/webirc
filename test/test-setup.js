@@ -1,3 +1,4 @@
+/*global beforeEach, afterEach, spyOn */
 var container = document.createElement('div');
 container.id = 'component';
 

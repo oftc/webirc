@@ -1,6 +1,7 @@
+/*global describe, it, expect, spyOn */
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
-import CommandBar from './../client/CommandBar.jsx'
+import CommandBar from './../client/CommandBar.jsx';
 
 describe('The CommandBar Component', function() {
     var component;

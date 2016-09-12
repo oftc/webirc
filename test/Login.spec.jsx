@@ -1,3 +1,4 @@
+/*global describe, it, expect, spyOn */
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import Login from './../client/Login.jsx';

@@ -1,3 +1,4 @@
+/*global describe, it, expect, beforeEach */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import TextWindow from './../client/TextWindow.jsx';
