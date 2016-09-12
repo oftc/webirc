@@ -168,6 +168,7 @@ class Irc extends React.Component {
             case '353':
                 this.on353Numeric(numeric.args);
                 break;
+            case '333':
             case '366':
                 // ignored numerics
                 break;
