@@ -12,6 +12,7 @@ import _ from 'underscore';
 describe('the Irc component', function() {
     var component;
     var socketMock = { on: function() { } };
+    var source = { nick: 'WebIRC', user: 'user', host: 'host' };
 
     stubComponent(MainWindow);
     stubComponent(ChannelList);
@@ -171,7 +172,7 @@ describe('the Irc component', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
-                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                    component.onJoin({ source: source, channel: '#test' });
 
                     var ret = component.processCommand('PART');
 
@@ -197,8 +198,8 @@ describe('the Irc component', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
-                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+                    component.onJoin({ source: source, channel: '#test' });
+                    component.onJoin({ source: source, channel: '#test2' });
 
                     var ret = component.processCommand('PART #test');
 
@@ -212,8 +213,8 @@ describe('the Irc component', function() {
                     spyOn(IRCStream.prototype, 'leaveChannel');
                     component = TestUtils.renderIntoDocument(<Irc />);
 
-                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                    component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
+                    component.onJoin({ source: source, channel: '#test' });
+                    component.onJoin({ source: source, channel: '#test2' });
 
                     var ret = component.processCommand('PART #TeSt');
 
@@ -229,7 +230,7 @@ describe('the Irc component', function() {
             it('should add the new channel to the state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
                 expect(component.state.channels['#test'].name).toBe('#test');
@@ -238,7 +239,7 @@ describe('the Irc component', function() {
             it('should deselect other channels and select the newly joined channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
 
                 expect(component.state.channels['#test'].selected).toBe(true);
                 expect(component.state.channels.status.selected).toBe(false);
@@ -249,8 +250,8 @@ describe('the Irc component', function() {
             it('should add the user to the channel and add a join message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
 
                 expect(component.state.channels['#test'].users.length).toBe(1);
                 expect(component.state.channels['#test'].messages.length).toBe(1);
@@ -263,8 +264,8 @@ describe('the Irc component', function() {
             it('should set the channel to be selected', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test2' });
+                component.onJoin({ source: source, channel: 'test' });
+                component.onJoin({ source: source, channel: 'test2' });
 
                 component.onChannelSelected('test');
 
@@ -277,8 +278,8 @@ describe('the Irc component', function() {
             it('should set the new channel selected and all others unselected', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test2' });
+                component.onJoin({ source: source, channel: 'test' });
+                component.onJoin({ source: source, channel: 'test2' });
 
                 component.onChannelSelected('test');
                 component.onChannelSelected('test2');
@@ -290,8 +291,8 @@ describe('the Irc component', function() {
             it('should clear the unread message count for the channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test2' });
+                component.onJoin({ source: source, channel: 'test' });
+                component.onJoin({ source: source, channel: 'test2' });
 
                 component.addMessageToChannel('test', '', ['testing']);
 
@@ -308,7 +309,7 @@ describe('the Irc component', function() {
             it('should increase the unread message count', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: 'test' });
+                component.onJoin({ source: source, channel: 'test' });
 
                 component.addMessageToChannel('status', '', ['testing']);
 
@@ -347,7 +348,7 @@ describe('the Irc component', function() {
                 spyOn(component, 'processCommand');
                 spyOn(IRCStream.prototype, 'sendMessage');
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
 
                 component.onCommand('Testing testing');
 
@@ -385,7 +386,7 @@ describe('the Irc component', function() {
             it('should add the message to the status channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onPrivmsg({ source: 'test!user@host', target: 'notyou', message: 'testing testing' });
+                component.onPrivmsg({ source: { nick: 'test', user: 'user', host: 'host' }, target: 'notyou', message: 'testing testing' });
 
                 expect(component.state.channels.status.messages.length).toBe(1);
             });
@@ -395,9 +396,9 @@ describe('the Irc component', function() {
             it('should add the message to the channel\'s messages', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
 
-                component.onPrivmsg({ source: 'test!user@host', target: '#test', message: 'testing testing' });
+                component.onPrivmsg({ source: { nick: 'test', user: 'user', host: 'host' }, target: '#test', message: 'testing testing' });
 
                 expect(component.state.channels['#test'].messages.length).toBe(1);
             });
@@ -407,7 +408,7 @@ describe('the Irc component', function() {
             it('should create the channel and add the message to it', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onPrivmsg({ source: 'test!user@host', target: '#test', message: 'testing testing' });
+                component.onPrivmsg({ source: { nick: 'test', user: 'user', host: 'host' }, target: '#test', message: 'testing testing' });
 
                 expect(component.state.channels['#test'].messages.length).toBe(1);
             });
@@ -417,7 +418,7 @@ describe('the Irc component', function() {
             it('should add new channel for that source with the message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onPrivmsg({ source: 'test!user@host', target: 'WebIRC', message: 'testing testing' });
+                component.onPrivmsg({ source: { nick: 'test', user: 'user', host: 'host' }, target: 'WebIRC', message: 'testing testing' });
 
                 expect(component.state.channels['test'].messages.length).toBe(1);
             });
@@ -441,7 +442,7 @@ describe('the Irc component', function() {
             it('should add the users to the channel user list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.on353Numeric(['=', '#test', 'nick1 nick2 nick3']);
 
                 expect(component.state.channels['#test'].users.length).toBe(3);
@@ -454,7 +455,7 @@ describe('the Irc component', function() {
             it('should set no topics', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.on332Numeric();
 
                 var topicsSet = _.any(component.state.channels, function(channel) {
@@ -469,7 +470,7 @@ describe('the Irc component', function() {
             it('should set the topic for that channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.on332Numeric(['#test', 'test topic']);
 
                 expect(component.state.channels['#test'].topic).toBe('test topic');
@@ -482,7 +483,7 @@ describe('the Irc component', function() {
             it('should not change any channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.onPart();
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
@@ -493,8 +494,8 @@ describe('the Irc component', function() {
             it('should remove the channel from the list', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onPart({ source: 'WebIRC!user@host', channel: '#test', message: 'Testing' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onPart({ source: source, channel: '#test', message: 'Testing' });
 
                 expect(component.state.channels['#test']).toBe(undefined);
             });
@@ -502,8 +503,8 @@ describe('the Irc component', function() {
             it('should set the selected channel to the status window', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onPart({ source: 'WebIRC!user@host', channel: '#test', message: 'Testing' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onPart({ source: source, channel: '#test', message: 'Testing' });
 
                 expect(component.state.channels.status.selected).toBe(true);
             });
@@ -513,9 +514,9 @@ describe('the Irc component', function() {
             it('should remove the user from the channel list and adds a part message', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test1!user@host', channel: '#test' });
-                component.onPart({ source: 'test1!user@host', channel: '#test', message: 'Testing' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test1', user: 'user', host: 'host' }, channel: '#test' });
+                component.onPart({ source: { nick: 'test1', user: 'user', host: 'host' }, channel: '#test', message: 'Testing' });
 
                 expect(component.state.channels['#test'].users.length).toBe(0);
                 expect(component.state.channels['#test'].messages.length).toBe(2);
@@ -528,8 +529,8 @@ describe('the Irc component', function() {
             it('should not change any channels or state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
 
                 component.onQuit();
 
@@ -542,8 +543,8 @@ describe('the Irc component', function() {
             it('should not change any channels or state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
                 component.onQuit({ source: 'unknown!user@host' });
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
@@ -555,9 +556,9 @@ describe('the Irc component', function() {
             it('should remove that user from the channel and display a message in that channel', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
-                component.onQuit({ source: 'test!user@host', message: 'quit' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
+                component.onQuit({ source: { nick: 'test', user: 'user', host: 'host' }, message: 'quit' });
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
                 expect(component.state.channels['#test'].users.length).toBe(0);
@@ -569,11 +570,11 @@ describe('the Irc component', function() {
             it('should remove that user from all of the channels and display a message in those channels', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test2' });
-                component.onQuit({ source: 'test!user@host', message: 'quit' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: source, channel: '#test2' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test2' });
+                component.onQuit({ source: { nick: 'test', user: 'user', host: 'host' }, message: 'quit' });
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
                 expect(component.state.channels['#test'].users.length).toBe(0);
@@ -599,7 +600,7 @@ describe('the Irc component', function() {
             it('should update our nickname', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onNick({ source: 'WebIRC!user@host', newnick: 'NewNick' });
+                component.onNick({ source: source, newnick: 'NewNick' });
 
                 expect(component.state.nickname).toBe('NewNick');
                 expect(component.state.channels.status.messages.length).toBe(1);
@@ -610,14 +611,14 @@ describe('the Irc component', function() {
             it('should update the nickname in all channels', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
-                component.onJoin({ source: 'test!user@host', channel: '#test' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test2' });
-                component.onJoin({ source: 'test!user@host', channel: '#test2' });
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test3' });
-                component.onJoin({ source: 'test!user@host', channel: '#test3' });
+                component.onJoin({ source: source, channel: '#test' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test' });
+                component.onJoin({ source: source, channel: '#test2' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test2' });
+                component.onJoin({ source: source, channel: '#test3' });
+                component.onJoin({ source: { nick: 'test', user: 'user', host: 'host' }, channel: '#test3' });
 
-                component.onNick({ source: 'test!user@host', newnick: 'NewNick' });
+                component.onNick({ source: { nick: 'test', user: 'user', host: 'host' }, newnick: 'NewNick' });
 
                 expect(component.state.nickname).toBe('WebIRC');
                 expect(component.state.channels.status.messages.length).toBe(0);
@@ -646,7 +647,7 @@ describe('the Irc component', function() {
             it('should not change the channel state', function() {
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.onCloseChannel();
 
                 expect(component.state.channels['#test']).not.toBe(undefined);
@@ -658,7 +659,7 @@ describe('the Irc component', function() {
                 spyOn(IRCStream.prototype, 'leaveChannel');
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onJoin({ source: 'WebIRC!user@host', channel: '#test' });
+                component.onJoin({ source: source, channel: '#test' });
                 component.onCloseChannel('#test');
 
                 expect(component.state.channels['#test']).toBe(undefined);
@@ -671,7 +672,7 @@ describe('the Irc component', function() {
                 spyOn(IRCStream.prototype, 'leaveChannel');
                 component = TestUtils.renderIntoDocument(<Irc />);
 
-                component.onPrivmsg({ source: 'tester!user@host', target: 'WebIRC', message: 'testy testy' });
+                component.onPrivmsg({ source: { nick: 'tester', user: 'user', host: 'host' }, target: 'WebIRC', message: 'testy testy' });
                 component.onCloseChannel('tester');
 
                 expect(component.state.channels['tester']).toBe(undefined);

@@ -20,17 +20,11 @@ class Irc extends React.Component {
         this.onNumeric = this.onNumeric.bind(this);
         this.onCloseChannel = this.onCloseChannel.bind(this);
         this.onNick = this.onNick.bind(this);
+        this.selectChannel = this.selectChannel.bind(this);
 
         this.state = {
             channels: {
-                'status': {
-                    key: 'status',
-                    name: 'Status',
-                    messages: [],
-                    users: [],
-                    selected: true,
-                    unreadCount: 0
-                }
+                'status': this.buildNewChannel('status', 'Status', true)
             }
         };
 
@@ -46,8 +40,6 @@ class Irc extends React.Component {
     componentDidMount() {
         var socket = io.connect('https://webirc.oftc.net:8443');
         var nickAttempts = 1;
-
-        this.stream.setNickname(this.state.nickname);
 
         this.stream.on('send', function(message) {
             socket.emit('message', message.message);
@@ -91,21 +83,30 @@ class Irc extends React.Component {
         };
     }
 
+    buildNewChannel(key, name, selected) {
+        return { key: key, name: name, messages: [], users: [], unreadCount: 0, selected: selected || false };
+    }
+
+    selectChannel(channelKey) {
+        var channels = this.state.channels;
+
+        _.each(channels, function(channel) {
+            channel.selected = false;
+        });
+
+        channels[channelKey].selected = true;
+    }
+
     onJoin(joinMessage) {
         var channels = this.state.channels;
         var channelKey = joinMessage.channel.toLowerCase();
-        var source = joinMessage.source.substr(0, joinMessage.source.indexOf('!'));
 
-        if(source === this.state.nickname) {
-            channels[channelKey] = { key: channelKey, name: joinMessage.channel, messages: [], users: [], unreadCount: 0 };
-            _.each(channels, function(channel) {
-                channel.selected = false;
-            });
-
-            channels[channelKey].selected = true;
+        if(joinMessage.source.nick === this.state.nickname) {
+            channels[channelKey] = this.buildNewChannel(channelKey, joinMessage.channel);
+            this.selectChannel(channelKey);
         } else {
-            this.addMessageToChannel(channelKey, '', [joinMessage.source + ' has joined ' + channelKey]);
-            channels[channelKey].users.push(source);
+            this.addMessageToChannel(channelKey, '', [joinMessage.source.nick + ' has joined ' + channelKey]);
+            channels[channelKey].users.push(joinMessage.source);
         }
 
         this.setState({ channels: channels });
@@ -119,23 +120,17 @@ class Irc extends React.Component {
         var channels = this.state.channels;
         var channelKey = partMessage.channel.toLowerCase();
 
-        var source = partMessage.source.substr(0, partMessage.source.indexOf('!'));
-
-        if(source === this.state.nickname) {
+        if(partMessage.source.nick === this.state.nickname) {
             delete channels[channelKey];
 
-            _.each(channels, function(channel) {
-                channel.selected = false;
-            });
-
-            channels.status.selected = true;
+            this.selectChannel('status');
         } else {
             var channel = channels[channelKey];
             channel.users = _.reject(channel.users, function(user) {
-                return user === source;
+                return user.nick === partMessage.source.nick;
             });
 
-            this.addMessageToChannel(channelKey, '', [partMessage.source + ' has left ' + channelKey]);
+            this.addMessageToChannel(channelKey, '', [partMessage.source.nick + ' has left ' + channelKey]);
         }
 
         this.setState({ channels: channels });
@@ -146,11 +141,9 @@ class Irc extends React.Component {
             return;
         }
 
-        var source = quitMessage.source.substr(0, quitMessage.source.indexOf('!'));
-
         _.each(this.state.channels, channel => {
             var matchingUser = _.find(channel.users, function(user) {
-                return user === source;
+                return user.nick === quitMessage.source.nick;
             });
 
             if(!matchingUser) {
@@ -159,7 +152,7 @@ class Irc extends React.Component {
 
             channel.users = _.without(channel.users, matchingUser);
 
-            this.addMessageToChannel(channel.key, '', [quitMessage.source + ' has quit: ' + quitMessage.message || '']);
+            this.addMessageToChannel(channel.key, '', [quitMessage.source.nick + ' has quit: ' + quitMessage.message || '']);
         });
     }
 
@@ -175,6 +168,9 @@ class Irc extends React.Component {
             case '353':
                 this.on353Numeric(numeric.args);
                 break;
+            case '366':
+                // ignored numerics
+                break;
             default:
                 this.addMessageToChannel('status', '', numeric.args);
                 break;
@@ -186,7 +182,7 @@ class Irc extends React.Component {
         var channel = channels[channelKey];
 
         if(!channel) {
-            channel = { key: channelKey, name: channelKey, messages: [] };
+            channel = this.buildNewChannel(channelKey, channelKey);
             channels[channelKey] = channel;
         }
 
@@ -205,7 +201,6 @@ class Irc extends React.Component {
             return;
         }
 
-        var source = message.source.substr(0, message.source.indexOf('!'));
         var target = '';
 
         if(message.target[0] === '#') {
@@ -213,10 +208,10 @@ class Irc extends React.Component {
         } else if(message.target !== this.state.nickname) {
             target = 'status';
         } else {
-            target = source;
+            target = message.source.nick;
         }
 
-        this.addMessageToChannel(target, '', ['[' + message.source + '] ' + message.message]);
+        this.addMessageToChannel(target, '', ['<' + message.source.nick + '> ' + message.message]);
     }
 
     onNick(message) {
@@ -224,9 +219,7 @@ class Irc extends React.Component {
             return;
         }
 
-        var source = message.source.substr(0, message.source.indexOf('!'));
-
-        if(source === this.state.nickname) {
+        if(message.source.nick === this.state.nickname) {
             this.setState({ nickname: message.newnick });
             this.addMessageToChannel('status', '', 'Nickname changed to ' + message.newnick);
             return;
@@ -234,7 +227,7 @@ class Irc extends React.Component {
 
         var targetChannels = _.filter(this.state.channels, function(channel) {
             return _.any(channel.users, function(user) {
-                return user === source;
+                return user.nick === message.source.nick;
             });
         });
 
@@ -242,12 +235,12 @@ class Irc extends React.Component {
             var channelKey = channel.key;
 
             channel.users = _.reject(channel.users, function(user) {
-                return user === source;
+                return user.nick === message.source.nick;
             });
 
             channel.users.push(message.newnick);
 
-            this.addMessageToChannel(channelKey, '', [message.source + ' is now known as ' + message.newnick]);
+            this.addMessageToChannel(channelKey, '', [message.source.nick + ' is now known as ' + message.newnick]);
         });
     }
 
@@ -346,11 +339,7 @@ class Irc extends React.Component {
     onChannelSelected(channel) {
         var channels = this.state.channels;
 
-        _.each(channels, function(c) {
-            c.selected = false;
-        });
-
-        channels[channel].selected = true;
+        this.selectChannel(channel);
         channels[channel].unreadCount = 0;
 
         this.setState({ channels: channels });
@@ -365,11 +354,7 @@ class Irc extends React.Component {
 
         delete channels[channel];
 
-        _.each(channels, function(c) {
-            c.selected = false;
-        });
-
-        channels.status.selected = true;
+        this.selectChannel('status');
 
         if(channel[0] === '#') {
             this.stream.leaveChannel(channel);
