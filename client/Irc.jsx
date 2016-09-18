@@ -40,6 +40,7 @@ class Irc extends React.Component {
     componentDidMount() {
         var socket = io.connect('https://webirc.oftc.net:8443');
         var nickAttempts = 1;
+        var self = this;
 
         this.stream.on('send', function(message) {
             socket.emit('message', message.message);
@@ -79,7 +80,7 @@ class Irc extends React.Component {
         });
 
         window.onbeforeunload = function() {
-            socket.disconnect();
+            self.stream.quit('browser tab closed');
         };
     }
 
